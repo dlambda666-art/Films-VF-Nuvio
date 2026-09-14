@@ -84,7 +84,7 @@ function toMeta(movie, vfRecord) {
 export async function buildCatalog(catalogId) {
   const verifiedIds = await getVerifiedVFIds();
 
-  if (!verifiedIds.length) {
+  if (!verifiedIds.size) {
     return [];
   }
 
