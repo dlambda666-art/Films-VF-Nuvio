@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated_at": "2026-09-14T14:03:35.110Z",
+  "updated_at": "2026-09-14T14:13:34.116Z",
   "source": "DoublageVF",
   "items": [
     {
@@ -37,7 +37,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:03:30.345Z"
+      "last_verified": "2026-09-14T14:13:28.241Z"
     },
     {
       "id": "0876fd64-fb93-4cda-905b-c332b68412cf",
@@ -61,7 +61,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:03:30.712Z"
+      "last_verified": "2026-09-14T14:13:29.793Z"
     },
     {
       "id": "535ccac9-2a79-4cd5-815f-0c14b592c9d5",
@@ -73,7 +73,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:03:31.071Z"
+      "last_verified": "2026-09-14T14:13:29.883Z"
     },
     {
       "id": "85fa5b87-2dca-42d3-90ff-23d7dcdb9621",
@@ -85,7 +85,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:03:31.258Z"
+      "last_verified": "2026-09-14T14:13:30.117Z"
     },
     {
       "id": "ac654354-e7c8-49d0-8d43-875f8d71549f",
@@ -97,7 +97,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:03:30.330Z"
+      "last_verified": "2026-09-14T14:13:28.246Z"
     },
     {
       "id": "bb73f6a0-27ab-458a-9221-66c887060f20",
@@ -121,7 +121,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:03:30.708Z"
+      "last_verified": "2026-09-14T14:13:28.709Z"
     },
     {
       "id": "cf00bdd0-624d-47d1-9274-2f26ff6de5f8",
@@ -133,7 +133,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:03:31.178Z"
+      "last_verified": "2026-09-14T14:13:29.642Z"
     },
     {
       "id": "b322e4ac-fe2b-4e6a-878e-782a192fa6e6",
@@ -169,7 +169,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:03:30.704Z"
+      "last_verified": "2026-09-14T14:13:29.173Z"
     },
     {
       "id": "dd2d99a9-0045-4f51-9e50-c31eab67da67",
@@ -205,7 +205,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:03:30.888Z"
+      "last_verified": "2026-09-14T14:13:29.413Z"
     },
     {
       "id": "de994105-805b-4a14-8d31-c6c98f952d8d",
@@ -253,7 +253,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:03:31.259Z"
+      "last_verified": "2026-09-14T14:13:30.213Z"
     },
     {
       "id": "df1368f4-7176-43f9-98bd-a0aab1a396b2",
@@ -277,7 +277,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:03:30.344Z"
+      "last_verified": "2026-09-14T14:13:28.245Z"
     },
     {
       "id": "7067ca09-45d3-4864-b5b2-4a373eb5efae",
@@ -301,7 +301,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:03:30.925Z"
+      "last_verified": "2026-09-14T14:13:29.753Z"
     },
     {
       "id": "0d6d3ef6-1a19-47c4-be1e-91934087ac4f",
@@ -337,7 +337,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:03:30.335Z"
+      "last_verified": "2026-09-14T14:13:28.243Z"
     },
     {
       "id": "742437a8-b092-4ee5-b2a4-790f6dc61ea2",
@@ -361,7 +361,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:03:30.533Z"
+      "last_verified": "2026-09-14T14:13:28.476Z"
     },
     {
       "id": "299858d8-b022-4514-9351-ac6b82bbcdc1",
@@ -385,7 +385,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:03:30.893Z"
+      "last_verified": "2026-09-14T14:13:29.527Z"
     },
     {
       "id": "a6ba44d5-e923-45b0-9046-387e97296d0e",
@@ -433,7 +433,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:03:30.525Z"
+      "last_verified": "2026-09-14T14:13:28.478Z"
     },
     {
       "id": "afe1f989-48b9-4470-8838-7535ccdaa4ac",
@@ -445,7 +445,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:03:31.075Z"
+      "last_verified": "2026-09-14T14:13:29.989Z"
     },
     {
       "id": "0197dc15-09cf-4795-ac03-f2b29316c1e3",
@@ -457,7 +457,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:03:30.704Z"
+      "last_verified": "2026-09-14T14:13:29.293Z"
     },
     {
       "id": "ec90db13-0274-42da-a18e-df7ff3028520",
@@ -493,7 +493,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:03:30.521Z"
+      "last_verified": "2026-09-14T14:13:28.483Z"
     },
     {
       "id": "b36fda08-a8d9-47bb-a4a9-e067a2d46913",
@@ -505,7 +505,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:03:31.306Z"
+      "last_verified": "2026-09-14T14:13:30.262Z"
     },
     {
       "id": "2b550b20-241e-4c5a-93a3-dea5a4761d4e",
@@ -517,7 +517,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:03:30.513Z"
+      "last_verified": "2026-09-14T14:13:28.479Z"
     },
     {
       "id": "ac566c7f-9579-4a84-bae4-a62913f4e397",
@@ -529,7 +529,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:03:30.720Z"
+      "last_verified": "2026-09-14T14:13:29.750Z"
     },
     {
       "id": "30a0472a-4891-48a7-8e87-769b684cf8a4",
@@ -541,7 +541,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:03:30.516Z"
+      "last_verified": "2026-09-14T14:13:28.491Z"
     },
     {
       "id": "048d5fa9-4685-4791-a6e8-f341d0a5e5a3",
@@ -601,7 +601,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:03:31.282Z"
+      "last_verified": "2026-09-14T14:13:30.225Z"
     },
     {
       "id": "6237364d-63f7-4d42-9552-85d3161a61bb",
@@ -613,7 +613,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:03:30.333Z"
+      "last_verified": "2026-09-14T14:13:28.246Z"
     },
     {
       "id": "9e81cae6-6ea0-41a1-97e6-aa945d324ec0",
@@ -673,7 +673,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:03:30.889Z"
+      "last_verified": "2026-09-14T14:13:30.252Z"
     },
     {
       "id": "28de1a4f-6790-46f8-b6a7-d0d401bef7bf",
@@ -685,7 +685,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:03:31.095Z"
+      "last_verified": "2026-09-14T14:13:29.977Z"
     },
     {
       "id": "0075cf36-7d9b-4ea3-b7f6-0047f16838f3",
@@ -697,7 +697,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:03:31.106Z"
+      "last_verified": "2026-09-14T14:13:30.028Z"
     },
     {
       "id": "39eb29dc-ccf1-4656-813e-505f2f79cef4",
