@@ -1,123 +1,58 @@
 import fs from "node:fs/promises";
 
 const BASE = "https://doublagevf.fr";
-const candidates = ["/", "/works", "/works?page=1"];
+const candidates = [
+  "/api",
+  "/api/works",
+  "/api/works?limit=10&page=1",
+  "/api/works/browse",
+  "/api/works/browse?page=1",
+  "/api/works/browse?page=1&limit=50",
+  "/api/works/browse?skip=0&limit=50",
+  "/api/search/universal?q=Predator",
+  "/api/search/universal?query=Predator",
+  "/api/search?q=Predator",
+  "/api/works?search=Predator",
+  "/api/works/browse?search=Predator"
+];
 
-async function fetchText(url) {
-  const r = await fetch(url, {
+async function request(path) {
+  const r = await fetch(BASE + path, {
     redirect: "follow",
     headers: {
-      "user-agent": "Mozilla/5.0 (compatible; Films-VF-Nuvio-Diagnostic/2.0)"
+      "accept": "application/json,text/plain,*/*",
+      "user-agent": "Mozilla/5.0 (compatible; Films-VF-Nuvio-API-Diagnostic/1.0)"
     }
   });
   const text = await r.text();
   return {
-    requested: url,
-    url: r.url,
+    path,
     status: r.status,
-    type: r.headers.get("content-type") || "",
-    text
-  };
-}
-
-function extractScriptSources(html, baseUrl) {
-  const out = new Set();
-  const re = /<script[^>]+src=["']([^"']+)["']/gi;
-  for (const m of html.matchAll(re)) {
-    try { out.add(new URL(m[1], baseUrl).href); } catch {}
-  }
-  return [...out];
-}
-
-function extractAssetSources(html, baseUrl) {
-  const out = new Set();
-  const re = /<(?:link|script)[^>]+(?:href|src)=["']([^"']+)["']/gi;
-  for (const m of html.matchAll(re)) {
-    if (/\.(?:js|mjs)(?:\?|$)/i.test(m[1]) || /modulepreload/i.test(m[0])) {
-      try { out.add(new URL(m[1], baseUrl).href); } catch {}
-    }
-  }
-  return [...out];
-}
-
-function inspectAppJs(text, url) {
-  const urls = new Set();
-  const patterns = [
-    /https?:\/\/[^"'`\s)]+/gi,
-    /["'`]\/(?:api|graphql|trpc|v1|v2|v3)\/[^"'`\s)]*/gi,
-    /["'`]\/[^"'`\s)]*(?:works|work|oeuvres|search|catalog|catalogue|tmdb)[^"'`\s)]*/gi
-  ];
-  for (const re of patterns) {
-    for (const m of text.matchAll(re)) urls.add(m[0]);
-  }
-
-  const interestingStrings = [];
-  const stringRe = /["'`]([^"'`\n]{1,220})["'`]/g;
-  for (const m of text.matchAll(stringRe)) {
-    const s = m[1];
-    if (/api|graphql|works|work|oeuvre|search|catalog|supabase|firebase|tmdb/i.test(s)) {
-      interestingStrings.push(s);
-    }
-    if (interestingStrings.length >= 120) break;
-  }
-
-  return {
-    url,
+    finalUrl: r.url,
+    contentType: r.headers.get("content-type") || "",
     length: text.length,
-    endpointCandidates: [...urls].slice(0, 150),
-    interestingStrings,
-    hasFetch: /\bfetch\s*\(/i.test(text),
-    hasAxios: /axios/i.test(text),
-    hasGraphql: /graphql/i.test(text),
-    hasSupabase: /supabase/i.test(text),
-    hasFirebase: /firebase/i.test(text),
-    hasTmdb: /themoviedb|tmdb/i.test(text)
+    preview: text.slice(0, 1200)
   };
 }
 
 async function main() {
-  const pages = [];
-  const assetUrls = new Set();
-
+  const results = [];
   for (const path of candidates) {
-    const r = await fetchText(BASE + path);
-    const scripts = extractScriptSources(r.text, r.url);
-    const assets = extractAssetSources(r.text, r.url);
-    scripts.forEach(x => assetUrls.add(x));
-    assets.forEach(x => assetUrls.add(x));
-
-    pages.push({
-      path,
-      status: r.status,
-      finalUrl: r.url,
-      contentType: r.type,
-      length: r.text.length,
-      title: (r.text.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] || "").replace(/\s+/g, " ").trim(),
-      scriptUrls: scripts,
-      assetUrls: assets
-    });
-  }
-
-  const appAssets = [];
-  for (const url of assetUrls) {
     try {
-      const r = await fetchText(url);
-      if (!/javascript|ecmascript|text\/plain/i.test(r.type) && !/\.(?:js|mjs)(?:\?|$)/i.test(url)) continue;
-      console.log(`Asset ${url}: ${r.status}, ${r.text.length} bytes`);
-      appAssets.push(inspectAppJs(r.text, url));
+      const result = await request(path);
+      console.log(`\n=== ${path} ===`);
+      console.log(`status=${result.status} type=${result.contentType} length=${result.length}`);
+      console.log(result.preview.replace(/\s+/g, " ").slice(0, 1000));
+      results.push(result);
     } catch (e) {
-      appAssets.push({ url, error: e.message });
+      console.log(`\n=== ${path} === ERROR ${e.message}`);
+      results.push({ path, error: e.message });
     }
   }
 
   await fs.writeFile(
-    "doublagevf-diagnostic.json",
-    JSON.stringify({
-      generated_at: new Date().toISOString(),
-      pages,
-      assetUrls: [...assetUrls],
-      appAssets
-    }, null, 2) + "\n"
+    "doublagevf-api-diagnostic.json",
+    JSON.stringify({ generated_at: new Date().toISOString(), results }, null, 2) + "\n"
   );
 }
 
