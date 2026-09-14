@@ -32,26 +32,71 @@ async function fetchBrowsePage(page) {
 }
 
 function isFilm(work) {
-  return String(work?.type || work?.work_type || "").toUpperCase() === "FILM";
+  const type = String(
+    work?.type ||
+    work?.work_type ||
+    work?.media_type ||
+    ""
+  ).toUpperCase();
+
+  return type === "FILM";
 }
 
-function getYear(work) {
-  const raw = work?.year ?? work?.release_year ?? work?.release_date;
-  const match = String(raw ?? "").match(/\b(19|20)\d{2}\b/);
+function extractYear(value) {
+  if (value == null) return null;
+
+  const match = String(value).match(/\b(19|20)\d{2}\b/);
   return match ? Number(match[0]) : null;
+}
+
+function findYear(obj) {
+  if (!obj || typeof obj !== "object") return null;
+
+  const keys = [
+    "year",
+    "release_year",
+    "releaseYear",
+    "release_date",
+    "releaseDate",
+    "date"
+  ];
+
+  for (const key of keys) {
+    const year = extractYear(obj[key]);
+    if (year) return year;
+  }
+
+  for (const value of Object.values(obj)) {
+    if (value && typeof value === "object") {
+      const year = findYear(value);
+      if (year) return year;
+    }
+  }
+
+  return null;
 }
 
 function extractTmdbId(value) {
   if (value == null) return null;
 
-  if (typeof value === "number" && Number.isInteger(value) && value > 0) {
+  if (
+    typeof value === "number" &&
+    Number.isInteger(value) &&
+    value > 0
+  ) {
     return value;
   }
 
   if (typeof value === "string") {
-    const m = value.match(/(?:movie[/:]|themoviedb\.org\/movie\/)(\d+)/i);
-    if (m) return Number(m[1]);
-    if (/^\d+$/.test(value)) return Number(value);
+    const match = value.match(
+      /(?:movie[/:]|themoviedb\.org\/movie\/)(\d+)/i
+    );
+
+    if (match) return Number(match[1]);
+
+    if (/^\d+$/.test(value)) {
+      return Number(value);
+    }
   }
 
   return null;
@@ -61,8 +106,13 @@ function findTmdbId(obj) {
   if (!obj || typeof obj !== "object") return null;
 
   const directKeys = [
-    "tmdb_id", "tmdbId", "tmdb", "tmdb_movie_id",
-    "external_id", "externalId", "tmdb_url"
+    "tmdb_id",
+    "tmdbId",
+    "tmdb",
+    "tmdb_movie_id",
+    "external_id",
+    "externalId",
+    "tmdb_url"
   ];
 
   for (const key of directKeys) {
@@ -81,71 +131,153 @@ function findTmdbId(obj) {
 }
 
 async function resolveTmdb(work) {
-  // Fast path: some API responses may already contain TMDB information.
-  const direct = findTmdbId(work);
-  if (direct) return direct;
+  const directId = findTmdbId(work);
 
-  // Preferred: work detail endpoint.
+  if (directId) {
+    return {
+      tmdbId: directId,
+      year: findYear(work)
+    };
+  }
+
+  /*
+   * On essaie d'abord la fiche complète DoublageVF.
+   */
   for (const route of [
     `/work/${encodeURIComponent(work.id)}`,
     `/works/${encodeURIComponent(work.id)}`
   ]) {
     try {
       const detail = await getJson(route);
-      const id = findTmdbId(detail);
-      if (id) return id;
+
+      const tmdbId = findTmdbId(detail);
+      const year =
+        findYear(detail) ||
+        findYear(work);
+
+      if (tmdbId) {
+        return {
+          tmdbId,
+          year
+        };
+      }
     } catch {}
   }
 
-  // Fallback: universal search by exact title.
+  /*
+   * Dernier recours : recherche universelle DoublageVF.
+   * On récupère maintenant aussi l'année du résultat.
+   */
   if (!work.title) return null;
 
   try {
     const q = encodeURIComponent(work.title);
-    const data = await getJson(`/search/universal?q=${q}`);
-    const works = Array.isArray(data?.works) ? data.works : [];
-
-    const year = getYear(work);
-    const exact = works.filter(x =>
-      String(x?.work_type || "").toUpperCase() === "FILM" &&
-      String(x?.title || "").trim().toLowerCase() ===
-        String(work.title).trim().toLowerCase()
+    const data = await getJson(
+      `/search/universal?q=${q}`
     );
 
-    const pool = exact.length ? exact : works.filter(x =>
-      String(x?.work_type || "").toUpperCase() === "FILM"
+    const works = Array.isArray(data?.works)
+      ? data.works
+      : [];
+
+    const filmWorks = works.filter(x =>
+      String(
+        x?.work_type ||
+        x?.type ||
+        ""
+      ).toUpperCase() === "FILM"
     );
 
-    if (!pool.length) return null;
+    if (!filmWorks.length) return null;
 
-    if (year != null) {
-      const sameYear = pool.find(x => Number(x?.year) === year);
-      if (sameYear?.tmdb_id) return Number(sameYear.tmdb_id);
+    const title = String(work.title)
+      .trim()
+      .toLowerCase();
+
+    const exact = filmWorks.filter(x =>
+      String(x?.title || "")
+        .trim()
+        .toLowerCase() === title
+    );
+
+    const pool = exact.length
+      ? exact
+      : filmWorks;
+
+    const sourceYear = findYear(work);
+
+    if (sourceYear) {
+      const sameYear = pool.find(
+        x => findYear(x) === sourceYear
+      );
+
+      if (sameYear) {
+        const tmdbId = findTmdbId(sameYear);
+
+        if (tmdbId) {
+          return {
+            tmdbId,
+            year: sourceYear
+          };
+        }
+      }
     }
 
-    const candidate = pool.find(x => Number.isInteger(Number(x?.tmdb_id)));
-    return candidate ? Number(candidate.tmdb_id) : null;
+    const candidate = pool.find(
+      x => findTmdbId(x)
+    );
+
+    if (!candidate) return null;
+
+    return {
+      tmdbId: findTmdbId(candidate),
+      year:
+        findYear(candidate) ||
+        sourceYear ||
+        null
+    };
   } catch {
     return null;
   }
 }
 
-async function mapWithConcurrency(items, worker, concurrency) {
+async function mapWithConcurrency(
+  items,
+  worker,
+  concurrency
+) {
   const results = new Array(items.length);
   let cursor = 0;
 
   async function run() {
     while (true) {
       const index = cursor++;
-      if (index >= items.length) return;
 
-      results[index] = await worker(items[index], index);
-      if (REQUEST_DELAY_MS) await sleep(REQUEST_DELAY_MS);
+      if (index >= items.length) {
+        return;
+      }
+
+      results[index] = await worker(
+        items[index],
+        index
+      );
+
+      if (REQUEST_DELAY_MS) {
+        await sleep(REQUEST_DELAY_MS);
+      }
     }
   }
 
   await Promise.all(
-    Array.from({ length: Math.min(concurrency, items.length) }, run)
+    Array.from(
+      {
+        length: Math.min(
+          concurrency,
+          items.length
+        )
+      },
+      run
+    )
   );
 
   return results;
@@ -153,141 +285,250 @@ async function mapWithConcurrency(items, worker, concurrency) {
 
 async function loadExisting() {
   try {
-    const raw = await readFile(INDEX_FILE, "utf8");
+    const raw = await readFile(
+      INDEX_FILE,
+      "utf8"
+    );
+
     const data = JSON.parse(raw);
-    const items = Array.isArray(data) ? data : data.items;
-    return Array.isArray(items) ? items : [];
+
+    const items = Array.isArray(data)
+      ? data
+      : data.items;
+
+    return Array.isArray(items)
+      ? items
+      : [];
   } catch {
     return [];
   }
 }
 
 async function main() {
-  const existing = loadExisting();
-  const existingItems = await existing;
+  const existingItems =
+    await loadExisting();
 
   const byTmdb = new Map(
     existingItems
-      .filter(x => Number.isInteger(Number(x?.tmdb_id)))
-      .map(x => [Number(x.tmdb_id), x])
+      .filter(x =>
+        Number.isInteger(
+          Number(x?.tmdb_id)
+        )
+      )
+      .map(x => [
+        Number(x.tmdb_id),
+        x
+      ])
   );
 
-  // A normal scheduled run scans the current first page(s).
-  // FULL_SYNC=1 scans the complete DoublageVF catalog.
-  const pages = FULL_SYNC ? MAX_PAGES : 8;
+  const pages = FULL_SYNC
+    ? MAX_PAGES
+    : 8;
 
   let scannedWorks = 0;
   let filmWorks = 0;
   let resolved = 0;
 
-  for (let page = 1; page <= pages; page++) {
+  for (
+    let page = 1;
+    page <= pages;
+    page++
+  ) {
     let payload;
 
     try {
-      payload = await fetchBrowsePage(page);
+      payload =
+        await fetchBrowsePage(page);
     } catch (error) {
-      console.error(`Page ${page} failed: ${error.message}`);
+      console.error(
+        `Page ${page} failed:`,
+        error.message
+      );
       continue;
     }
 
-    const works = Array.isArray(payload?.works) ? payload.works : [];
+    const works =
+      Array.isArray(payload?.works)
+        ? payload.works
+        : [];
+
     if (!works.length) break;
 
     scannedWorks += works.length;
 
-    const films = works.filter(isFilm);
+    const films =
+      works.filter(isFilm);
+
     filmWorks += films.length;
 
-    const resolvedPage = await mapWithConcurrency(
-      films,
-      async work => {
-        const tmdbId = await resolveTmdb(work);
+    const resolvedPage =
+      await mapWithConcurrency(
+        films,
+        async work => {
+          const result =
+            await resolveTmdb(work);
 
-        if (!tmdbId) {
-          console.log(`TMDB introuvable: ${work.title}`);
-          return null;
-        }
+          if (!result?.tmdbId) {
+            console.log(
+              `TMDB introuvable: ${work.title}`
+            );
+            return null;
+          }
 
-        resolved++;
-        return {
-          id: work.id,
-          tmdb_id: tmdbId,
-          title: work.title || null,
-          year: getYear(work),
-          vf_confirmed: true,
-          vf_country: "FR",
-          source: "DoublageVF",
-          confidence: 1,
-          status: "confirmed",
-          last_verified: new Date().toISOString()
-        };
-      },
-      CONCURRENCY
-    );
+          resolved++;
+
+          return {
+            id: work.id,
+            tmdb_id: result.tmdbId,
+            title:
+              work.title || null,
+            year:
+              result.year || null,
+            vf_confirmed: true,
+            vf_country: "FR",
+            source: "DoublageVF",
+            confidence: 1,
+            status: "confirmed",
+            last_verified:
+              new Date().toISOString()
+          };
+        },
+        CONCURRENCY
+      );
 
     for (const item of resolvedPage) {
-      if (item) {
-        const previous = byTmdb.get(item.tmdb_id);
-        byTmdb.set(item.tmdb_id, {
+      if (!item) continue;
+
+      const previous =
+        byTmdb.get(item.tmdb_id);
+
+      /*
+       * On conserve les anciennes données
+       * si la nouvelle réponse est incomplète.
+       */
+      byTmdb.set(
+        item.tmdb_id,
+        {
           ...previous,
-          ...item
-        });
-      }
+          ...item,
+          year:
+            item.year ||
+            previous?.year ||
+            null
+        }
+      );
     }
 
     console.log(
-      `Page ${page}/${pages}: ${works.length} œuvres, ${films.length} films, ` +
+      `Page ${page}/${pages}: ` +
+      `${works.length} œuvres, ` +
+      `${films.length} films, ` +
       `${resolvedPage.filter(Boolean).length} TMDB résolus.`
     );
 
-    // On a reached the end of the browse catalogue.
-    const pagination = payload?.pagination;
+    const pagination =
+      payload?.pagination;
+
     if (pagination) {
       const totalPages =
-        Number(pagination.total_pages) ||
-        Number(pagination.pages) ||
-        Number(pagination.last_page);
+        Number(
+          pagination.total_pages
+        ) ||
+        Number(
+          pagination.pages
+        ) ||
+        Number(
+          pagination.last_page
+        );
 
-      if (Number.isFinite(totalPages) && page >= totalPages) break;
+      if (
+        Number.isFinite(totalPages) &&
+        page >= totalPages
+      ) {
+        break;
+      }
     }
 
-    if (works.length < PAGE_SIZE) break;
+    if (works.length < PAGE_SIZE) {
+      break;
+    }
   }
 
-  const items = [...byTmdb.values()]
-    .filter(x => Number.isInteger(Number(x.tmdb_id)) && Number(x.tmdb_id) > 0)
-    .map(x => ({
-      id: x.id || null,
-      tmdb_id: Number(x.tmdb_id),
-      title: x.title || null,
-      year: x.year || null,
-      vf_confirmed: true,
-      vf_country: x.vf_country || "FR",
-      source: x.source || "DoublageVF",
-      confidence: Number(x.confidence ?? 1),
-      status: "confirmed",
-      last_verified: x.last_verified || new Date().toISOString()
-    }))
-    .sort((a, b) => {
-      const ay = Number(a.year || 0);
-      const by = Number(b.year || 0);
-      return by - ay || String(a.title || "").localeCompare(String(b.title || ""));
-    });
+  const items =
+    [...byTmdb.values()]
+      .filter(x =>
+        Number.isInteger(
+          Number(x?.tmdb_id)
+        ) &&
+        Number(x.tmdb_id) > 0
+      )
+      .map(x => ({
+        id: x.id || null,
+        tmdb_id: Number(x.tmdb_id),
+        title: x.title || null,
+        year:
+          x.year
+            ? Number(x.year)
+            : null,
+        vf_confirmed: true,
+        vf_country:
+          x.vf_country || "FR",
+        source:
+          x.source || "DoublageVF",
+        confidence:
+          Number(x.confidence ?? 1),
+        status: "confirmed",
+        last_verified:
+          x.last_verified ||
+          new Date().toISOString()
+      }))
+      .sort((a, b) => {
+        const ay =
+          Number(a.year || 0);
+
+        const by =
+          Number(b.year || 0);
+
+        return (
+          by - ay ||
+          String(a.title || "")
+            .localeCompare(
+              String(b.title || "")
+            )
+        );
+      });
 
   const output = {
     version: 2,
-    updated_at: new Date().toISOString(),
+    updated_at:
+      new Date().toISOString(),
     source: "DoublageVF",
     items
   };
 
-  await writeFile(INDEX_FILE, JSON.stringify(output, null, 2) + "\n", "utf8");
+  await writeFile(
+    INDEX_FILE,
+    JSON.stringify(
+      output,
+      null,
+      2
+    ) + "\n",
+    "utf8"
+  );
 
   console.log("");
-  console.log(`Œuvres scannées : ${scannedWorks}`);
-  console.log(`Films trouvés   : ${filmWorks}`);
-  console.log(`TMDB résolus    : ${resolved}`);
-  console.log(`Index final     : ${items.length}`);
+  console.log(
+    `Œuvres scannées : ${scannedWorks}`
+  );
+  console.log(
+    `Films trouvés   : ${filmWorks}`
+  );
+  console.log(
+    `TMDB résolus    : ${resolved}`
+  );
+  console.log(
+    `Index final     : ${items.length}`
+  );
 }
 
 main().catch(error => {
