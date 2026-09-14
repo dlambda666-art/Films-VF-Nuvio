@@ -1,111 +1,296 @@
-import fs from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 
-const BASE = "https://doublagevf.fr";
+const BASE = "https://doublagevf.fr/api";
 const INDEX_FILE = "vf-index.json";
+
+const PAGE_SIZE = Number(process.env.PAGE_SIZE || 50);
+const MAX_PAGES = Number(process.env.MAX_PAGES || 428);
+const CONCURRENCY = Number(process.env.CONCURRENCY || 8);
+const REQUEST_DELAY_MS = Number(process.env.REQUEST_DELAY_MS || 100);
 const FULL_SYNC = process.env.FULL_SYNC === "1";
-const PAGE_COUNT = Number(process.env.PAGE_COUNT || (FULL_SYNC ? 428 : 12));
-const CONCURRENCY = Number(process.env.CONCURRENCY || 3);
-const REQUEST_DELAY_MS = Number(process.env.REQUEST_DELAY_MS || 350);
 
-const sleep = ms => new Promise(r => setTimeout(r, ms));
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-function stripHtml(v) {
-  return v.replace(/<script[\s\S]*?<\/script>/gi," ")
-    .replace(/<style[\s\S]*?<\/style>/gi," ")
-    .replace(/<[^>]+>/g," ").replace(/ /g," ")
-    .replace(/&/g,"&").replace(/'/g,"'")
-    .replace(/"/g,'"').replace(/\s+/g," ").trim();
-}
+async function getJson(path) {
+  const response = await fetch(`${BASE}${path}`, {
+    headers: {
+      Accept: "application/json",
+      "User-Agent": "Films-VF-Nuvio/1.0"
+    }
+  });
 
-async function fetchText(url) {
-  const r = await fetch(url,{headers:{
-    "user-agent":"Films-VF-Nuvio/1.0 (+https://github.com/dlambda666-art/Films-VF-Nuvio)"
-  }});
-  if (!r.ok) throw new Error(`${r.status} ${url}`);
-  return r.text();
-}
-
-function extractWorkLinks(html) {
-  const found = new Map();
-  const re = /href=["'](\/work\/[^"'?#]+)["'][^>]*>([\s\S]*?)<\/a>/gi;
-  for (const m of html.matchAll(re)) {
-    const title = stripHtml(m[2]);
-    if (title && title.length <= 200) found.set(m[1],{href:m[1],title});
+  if (!response.ok) {
+    throw new Error(`${response.status} ${path}`);
   }
-  return [...found.values()];
+
+  return response.json();
 }
 
-function extractYear(text) {
-  const m = text.match(/\bFilm\s+(19\d{2}|20\d{2})\b/i);
-  return m ? Number(m[1]) : null;
+async function fetchBrowsePage(page) {
+  const skip = (page - 1) * PAGE_SIZE;
+  return getJson(`/works/browse?skip=${skip}&limit=${PAGE_SIZE}`);
 }
 
-function extractTmdbId(html,text) {
-  const patterns = [
-    /themoviedb\.org\/movie\/(\d+)/i,
-    /tmdb(?:_id|Id|ID)?["':=\s]+(\d{2,10})/i,
-    /["']tmdb["']\s*:\s*["']?(\d{2,10})/i
-  ];
-  for (const p of patterns) {
-    const m = html.match(p) || text.match(p);
+function isFilm(work) {
+  return String(work?.type || work?.work_type || "").toUpperCase() === "FILM";
+}
+
+function getYear(work) {
+  const raw = work?.year ?? work?.release_year ?? work?.release_date;
+  const match = String(raw ?? "").match(/\b(19|20)\d{2}\b/);
+  return match ? Number(match[0]) : null;
+}
+
+function extractTmdbId(value) {
+  if (value == null) return null;
+
+  if (typeof value === "number" && Number.isInteger(value) && value > 0) {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    const m = value.match(/(?:movie[/:]|themoviedb\.org\/movie\/)(\d+)/i);
     if (m) return Number(m[1]);
+    if (/^\d+$/.test(value)) return Number(value);
   }
+
   return null;
 }
 
-async function fetchWork(item) {
-  const html = await fetchText(BASE + item.href);
-  const text = stripHtml(html);
-  if (!/\bFilm\s+(19\d{2}|20\d{2})\b/i.test(text)) return null;
-  if (!/Doublage français\s*\(\s*\d+/i.test(text)) return null;
-  const tmdbId = extractTmdbId(html,text);
-  if (!tmdbId) return null;
-  return {
-    tmdb_id: tmdbId, title: item.title, year: extractYear(text),
-    vf_confirmed: true, vf_country: null, source: "DoublageVF",
-    confidence: 1, status: "confirmed", last_verified: new Date().toISOString()
-  };
-}
+function findTmdbId(obj) {
+  if (!obj || typeof obj !== "object") return null;
 
-async function mapConcurrent(items) {
-  const results=[]; let cursor=0;
-  async function worker() {
-    while (true) {
-      const i=cursor++;
-      if (i>=items.length) return;
-      try { const r=await fetchWork(items[i]); if(r) results.push(r); }
-      catch(e){ console.warn("Skipped:",items[i].href,e.message); }
-      await sleep(REQUEST_DELAY_MS);
+  const directKeys = [
+    "tmdb_id", "tmdbId", "tmdb", "tmdb_movie_id",
+    "external_id", "externalId", "tmdb_url"
+  ];
+
+  for (const key of directKeys) {
+    const id = extractTmdbId(obj[key]);
+    if (id) return id;
+  }
+
+  for (const value of Object.values(obj)) {
+    if (value && typeof value === "object") {
+      const id = findTmdbId(value);
+      if (id) return id;
     }
   }
-  await Promise.all(Array.from({length:CONCURRENCY},worker));
+
+  return null;
+}
+
+async function resolveTmdb(work) {
+  // Fast path: some API responses may already contain TMDB information.
+  const direct = findTmdbId(work);
+  if (direct) return direct;
+
+  // Preferred: work detail endpoint.
+  for (const route of [
+    `/work/${encodeURIComponent(work.id)}`,
+    `/works/${encodeURIComponent(work.id)}`
+  ]) {
+    try {
+      const detail = await getJson(route);
+      const id = findTmdbId(detail);
+      if (id) return id;
+    } catch {}
+  }
+
+  // Fallback: universal search by exact title.
+  if (!work.title) return null;
+
+  try {
+    const q = encodeURIComponent(work.title);
+    const data = await getJson(`/search/universal?q=${q}`);
+    const works = Array.isArray(data?.works) ? data.works : [];
+
+    const year = getYear(work);
+    const exact = works.filter(x =>
+      String(x?.work_type || "").toUpperCase() === "FILM" &&
+      String(x?.title || "").trim().toLowerCase() ===
+        String(work.title).trim().toLowerCase()
+    );
+
+    const pool = exact.length ? exact : works.filter(x =>
+      String(x?.work_type || "").toUpperCase() === "FILM"
+    );
+
+    if (!pool.length) return null;
+
+    if (year != null) {
+      const sameYear = pool.find(x => Number(x?.year) === year);
+      if (sameYear?.tmdb_id) return Number(sameYear.tmdb_id);
+    }
+
+    const candidate = pool.find(x => Number.isInteger(Number(x?.tmdb_id)));
+    return candidate ? Number(candidate.tmdb_id) : null;
+  } catch {
+    return null;
+  }
+}
+
+async function mapWithConcurrency(items, worker, concurrency) {
+  const results = new Array(items.length);
+  let cursor = 0;
+
+  async function run() {
+    while (true) {
+      const index = cursor++;
+      if (index >= items.length) return;
+
+      results[index] = await worker(items[index], index);
+      if (REQUEST_DELAY_MS) await sleep(REQUEST_DELAY_MS);
+    }
+  }
+
+  await Promise.all(
+    Array.from({ length: Math.min(concurrency, items.length) }, run)
+  );
+
   return results;
 }
 
-async function main() {
-  let existing={version:1,updated_at:null,items:[]};
-  try { existing=JSON.parse(await fs.readFile(INDEX_FILE,"utf8")); } catch {}
-  const byTmdb=new Map((existing.items||[])
-    .filter(x=>Number.isInteger(Number(x.tmdb_id)))
-    .map(x=>[Number(x.tmdb_id),x]));
+async function loadExisting() {
+  try {
+    const raw = await readFile(INDEX_FILE, "utf8");
+    const data = JSON.parse(raw);
+    const items = Array.isArray(data) ? data : data.items;
+    return Array.isArray(items) ? items : [];
+  } catch {
+    return [];
+  }
+}
 
-  for(let page=1;page<=PAGE_COUNT;page++){
-    console.log(`Scanning DoublageVF works page ${page}/${PAGE_COUNT}`);
-    let html;
-    try { html=await fetchText(`${BASE}/works?page=${page}`); }
-    catch(e){ console.warn("Page skipped:",e.message); continue; }
-    const works=extractWorkLinks(html);
-    console.log(`  ${works.length} works found`);
-    for(const r of await mapConcurrent(works))
-      byTmdb.set(r.tmdb_id,{...(byTmdb.get(r.tmdb_id)||{}),...r});
+async function main() {
+  const existing = loadExisting();
+  const existingItems = await existing;
+
+  const byTmdb = new Map(
+    existingItems
+      .filter(x => Number.isInteger(Number(x?.tmdb_id)))
+      .map(x => [Number(x.tmdb_id), x])
+  );
+
+  // A normal scheduled run scans the current first page(s).
+  // FULL_SYNC=1 scans the complete DoublageVF catalog.
+  const pages = FULL_SYNC ? MAX_PAGES : 8;
+
+  let scannedWorks = 0;
+  let filmWorks = 0;
+  let resolved = 0;
+
+  for (let page = 1; page <= pages; page++) {
+    let payload;
+
+    try {
+      payload = await fetchBrowsePage(page);
+    } catch (error) {
+      console.error(`Page ${page} failed: ${error.message}`);
+      continue;
+    }
+
+    const works = Array.isArray(payload?.works) ? payload.works : [];
+    if (!works.length) break;
+
+    scannedWorks += works.length;
+
+    const films = works.filter(isFilm);
+    filmWorks += films.length;
+
+    const resolvedPage = await mapWithConcurrency(
+      films,
+      async work => {
+        const tmdbId = await resolveTmdb(work);
+
+        if (!tmdbId) {
+          console.log(`TMDB introuvable: ${work.title}`);
+          return null;
+        }
+
+        resolved++;
+        return {
+          id: work.id,
+          tmdb_id: tmdbId,
+          title: work.title || null,
+          year: getYear(work),
+          vf_confirmed: true,
+          vf_country: "FR",
+          source: "DoublageVF",
+          confidence: 1,
+          status: "confirmed",
+          last_verified: new Date().toISOString()
+        };
+      },
+      CONCURRENCY
+    );
+
+    for (const item of resolvedPage) {
+      if (item) {
+        const previous = byTmdb.get(item.tmdb_id);
+        byTmdb.set(item.tmdb_id, {
+          ...previous,
+          ...item
+        });
+      }
+    }
+
+    console.log(
+      `Page ${page}/${pages}: ${works.length} œuvres, ${films.length} films, ` +
+      `${resolvedPage.filter(Boolean).length} TMDB résolus.`
+    );
+
+    // On a reached the end of the browse catalogue.
+    const pagination = payload?.pagination;
+    if (pagination) {
+      const totalPages =
+        Number(pagination.total_pages) ||
+        Number(pagination.pages) ||
+        Number(pagination.last_page);
+
+      if (Number.isFinite(totalPages) && page >= totalPages) break;
+    }
+
+    if (works.length < PAGE_SIZE) break;
   }
 
-  const items=[...byTmdb.values()].filter(x=>x.vf_confirmed===true)
-    .sort((a,b)=>Number(b.year||0)-Number(a.year||0)||String(a.title||"").localeCompare(String(b.title||""),"fr"));
+  const items = [...byTmdb.values()]
+    .filter(x => Number.isInteger(Number(x.tmdb_id)) && Number(x.tmdb_id) > 0)
+    .map(x => ({
+      id: x.id || null,
+      tmdb_id: Number(x.tmdb_id),
+      title: x.title || null,
+      year: x.year || null,
+      vf_confirmed: true,
+      vf_country: x.vf_country || "FR",
+      source: x.source || "DoublageVF",
+      confidence: Number(x.confidence ?? 1),
+      status: "confirmed",
+      last_verified: x.last_verified || new Date().toISOString()
+    }))
+    .sort((a, b) => {
+      const ay = Number(a.year || 0);
+      const by = Number(b.year || 0);
+      return by - ay || String(a.title || "").localeCompare(String(b.title || ""));
+    });
 
-  await fs.writeFile(INDEX_FILE,JSON.stringify({
-    version:1,updated_at:new Date().toISOString(),items
-  },null,2)+"\n");
-  console.log(`VF index updated: ${items.length} confirmed films`);
+  const output = {
+    version: 2,
+    updated_at: new Date().toISOString(),
+    source: "DoublageVF",
+    items
+  };
+
+  await writeFile(INDEX_FILE, JSON.stringify(output, null, 2) + "\n", "utf8");
+
+  console.log("");
+  console.log(`Œuvres scannées : ${scannedWorks}`);
+  console.log(`Films trouvés   : ${filmWorks}`);
+  console.log(`TMDB résolus    : ${resolved}`);
+  console.log(`Index final     : ${items.length}`);
 }
-main().catch(e=>{console.error(e);process.exit(1);});
+
+main().catch(error => {
+  console.error(error);
+  process.exit(1);
+});
