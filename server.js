@@ -12,7 +12,7 @@ const catalogs = [
 
 const manifest = {
   id: "films-vf-nuvio",
-  version: "1.0.0",
+  version: "1.0.1",
   name: "Films VF Nuvio",
   description:
     "Catalogue dynamique dédié aux films étrangers doublés en français.",
