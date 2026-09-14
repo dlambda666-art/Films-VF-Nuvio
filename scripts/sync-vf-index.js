@@ -1,4 +1,4 @@
-import { readFile, writeFile } from "node:fs/promises";
+loimport { readFile, writeFile } from "node:fs/promises";
 
 const BASE = "https://doublagevf.fr/api";
 const INDEX_FILE = "vf-index.json";
@@ -83,7 +83,7 @@ function isFilm(work) {
 function extractYear(value) {
   if (value == null) return null;
 
-  const match = String(value).match(/\b(?:19|20)\d{2}\b`);
+  const match = String(value).match(/\b(?:19|20)\d{2}\b/);
 
   return match ? Number(match[0]) : null;
 }
