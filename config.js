@@ -2,35 +2,29 @@ export const CONFIG = {
   maxResults: 40,
   tmdbPages: 8,
 
-  excludedMovieGenres: new Set([99, 10402, 10770]),
+  excludedMovieGenres: new Set([
+    18,    // Drame
+    35,    // Comédie
+    10749, // Romance
+    10751, // Famille
+    16,    // Animation
+    99,    // Documentaire
+    10402, // Musique
+    10770  // Téléfilm
+  ]),
 
   catalogs: [
-    { id: "nouveautes-vf-2026", name: "Nouveautés VF 2026" },
-    { id: "vf-2025", name: "VF 2025" },
-    { id: "action", name: "Action" },
-    { id: "thriller", name: "Thriller" },
-    { id: "horreur", name: "Horreur" },
-    { id: "science-fiction", name: "Science-fiction" },
-    { id: "fantastique", name: "Fantastique" },
-    { id: "aventure", name: "Aventure" },
-    { id: "crime-policier", name: "Crime/Policier" },
-    { id: "guerre", name: "Guerre" },
-    { id: "western", name: "Western" },
-    { id: "mystere", name: "Mystère" },
-    { id: "historique", name: "Historique" }
+    {
+      id: "nouveautes-vf",
+      name: "Nouveautés VF"
+    },
+    {
+      id: "horreur",
+      name: "Horreur VF"
+    }
   ],
 
   genreMap: {
-    action: 28,
-    thriller: 53,
-    horreur: 27,
-    "science-fiction": 878,
-    fantastique: 14,
-    aventure: 12,
-    "crime-policier": 80,
-    guerre: 10752,
-    western: 37,
-    mystere: 9648,
-    historique: 36
+    horreur: 27
   }
 };
