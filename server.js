@@ -16,14 +16,16 @@ const manifest = {
   name: "Films VF Nuvio",
   description:
     "Catalogue dynamique dédié aux films étrangers doublés en français.",
+
   resources: [
-  "catalog",
-  {
-    name: "meta",
-    types: ["movie"],
-    idPrefixes: ["tmdb-"]
-  }
-],
+    "catalog",
+    {
+      name: "meta",
+      types: ["movie"],
+      idPrefixes: ["tmdb:"]
+    }
+  ],
+
   types: ["movie"],
 
   catalogs: catalogs.map(([id, name]) => ({
@@ -47,6 +49,7 @@ app.get("/catalog/:type/:id.json", async (req, res) => {
     res.json({ metas });
   } catch (error) {
     console.error("Catalog error:", error);
+
     res.status(500).json({
       metas: [],
       error: "Catalog unavailable"
@@ -70,7 +73,9 @@ app.get("/meta/:type/:id.json", async (req, res) => {
       });
     }
 
-   res.json({ meta });
+    // Format Stremio correct
+    res.json({ meta });
+
   } catch (error) {
     console.error("Meta error:", error);
 
