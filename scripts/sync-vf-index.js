@@ -5,18 +5,15 @@ const TMDB_BASE = "https://api.themoviedb.org/3";
 const INDEX_FILE = "vf-index.json";
 
 const PAGE_SIZE = 50;
-const MAX_PAGES = 428;
-
-const PAGE_DELAY_MS = 3000;
-const TMDB_DELAY_MS = 150;
-const TMDB_CONCURRENCY = 5;
-
-const MAX_429_RETRIES = 2;
-const MAX_429_WAIT_MS = 30000;
 
 const TMDB_API_KEY = process.env.TMDB_API_KEY || "";
 const FULL_SYNC = process.env.FULL_SYNC === "1";
 
+const MAX_PAGES = FULL_SYNC ? 428 : 10;
+
+const PAGE_DELAY_MS = 3000;
+const TMDB_DELAY_MS = 150;
+const TMDB_CONCURRENCY = 5;
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
