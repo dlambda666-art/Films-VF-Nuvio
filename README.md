@@ -1,8 +1,43 @@
-# VF Index Sync
+# Films VF Nuvio
 
-Ce dossier alimente `vf-index.json` avec les films dont une VF confirmée est recensée par DoublageVF.
+Catalogue Nuvio dynamique dédié aux films étrangers doublés en français (VF).
 
-- Premier lancement : utiliser `workflow_dispatch` avec `full_sync = true`.
-- Ensuite : le workflow planifié rescane les 12 premières pages chaque jour.
-- Les entrées déjà présentes sont conservées.
-- Seules les fiches identifiées avec un TMDB ID et une section de doublage français confirmée sont ajoutées.
+## Architecture
+
+TMDB fournit les candidats et les métadonnées.  
+Un index VF indépendant contient uniquement les films dont la VF est confirmée.
+
+Le catalogue Nuvio lit cet index et ne dépend pas de Frankenstream.
+
+## VF Index Sync
+
+Le script `scripts/sync-vf-index.js` alimente `vf-index.json` à partir des fiches publiques de DoublageVF.
+
+Le workflow GitHub Actions `.github/workflows/vf-index-sync.yml` permet de lancer la synchronisation automatiquement.
+
+## Configuration
+
+Le projet utilise notamment :
+
+- `TMDB_API_KEY` pour les appels TMDB.
+- `VF_INDEX_URL` pour l'URL publique de `vf-index.json`.
+
+## Catalogue
+
+Films uniquement :
+
+- Nouveautés VF 2026
+- VF 2025
+- Action
+- Thriller
+- Horreur
+- Science-fiction
+- Fantastique
+- Aventure
+- Crime/Policier
+- Guerre
+- Western
+- Mystère
+- Historique
+
+Projet indépendant de Frankenstream.
