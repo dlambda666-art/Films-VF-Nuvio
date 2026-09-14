@@ -1,62 +1,109 @@
-import fs from "node:fs/promises";
-
 const BASE = "https://doublagevf.fr";
+
 const candidates = [
-  "/api",
-  "/api/works",
-  "/api/works?limit=10&page=1",
-  "/api/works/browse",
-  "/api/works/browse?page=1",
-  "/api/works/browse?page=1&limit=50",
   "/api/works/browse?skip=0&limit=50",
+  "/api/works/browse?page=1&limit=50",
   "/api/search/universal?q=Predator",
-  "/api/search/universal?query=Predator",
-  "/api/search?q=Predator",
   "/api/works?search=Predator",
-  "/api/works/browse?search=Predator"
+  "/api/search?q=Predator"
 ];
 
-async function request(path) {
-  const r = await fetch(BASE + path, {
-    redirect: "follow",
-    headers: {
-      "accept": "application/json,text/plain,*/*",
-      "user-agent": "Mozilla/5.0 (compatible; Films-VF-Nuvio-API-Diagnostic/1.0)"
-    }
-  });
-  const text = await r.text();
-  return {
-    path,
-    status: r.status,
-    finalUrl: r.url,
-    contentType: r.headers.get("content-type") || "",
-    length: text.length,
-    preview: text.slice(0, 1200)
-  };
-}
+async function test(path) {
+  const url = `${BASE}${path}`;
+  const started = Date.now();
 
-async function main() {
-  const results = [];
-  for (const path of candidates) {
+  try {
+    const response = await fetch(url, {
+      headers: {
+        "Accept": "application/json, text/plain, */*",
+        "User-Agent": "Films-VF-Nuvio diagnostic"
+      }
+    });
+
+    const contentType = response.headers.get("content-type") || "";
+    const text = await response.text();
+
+    let json = null;
     try {
-      const result = await request(path);
-      console.log(`\n=== ${path} ===`);
-      console.log(`status=${result.status} type=${result.contentType} length=${result.length}`);
-      console.log(result.preview.replace(/\s+/g, " ").slice(0, 1000));
-      results.push(result);
-    } catch (e) {
-      console.log(`\n=== ${path} === ERROR ${e.message}`);
-      results.push({ path, error: e.message });
-    }
-  }
+      json = JSON.parse(text);
+    } catch {}
 
-  await fs.writeFile(
-    "doublagevf-api-diagnostic.json",
-    JSON.stringify({ generated_at: new Date().toISOString(), results }, null, 2) + "\n"
-  );
+    const result = {
+      url,
+      status: response.status,
+      content_type: contentType,
+      length: text.length,
+      duration_ms: Date.now() - started,
+      is_json: !!json,
+      json_type: json === null ? null : Array.isArray(json) ? "array" : typeof json,
+      top_level_keys:
+        json && typeof json === "object" && !Array.isArray(json)
+          ? Object.keys(json).slice(0, 40)
+          : [],
+      array_lengths:
+        json && typeof json === "object"
+          ? Object.fromEntries(
+              Object.entries(json)
+                .filter(([, value]) => Array.isArray(value))
+                .map(([key, value]) => [key, value.length])
+            )
+          : {},
+      preview: text.slice(0, 1200)
+    };
+
+    if (Array.isArray(json)) {
+      result.first_item_keys =
+        json[0] && typeof json[0] === "object" ? Object.keys(json[0]).slice(0, 40) : [];
+      result.first_items = json.slice(0, 3);
+    } else if (json && typeof json === "object") {
+      for (const key of Object.keys(json)) {
+        if (Array.isArray(json[key]) && json[key][0] && typeof json[key][0] === "object") {
+          result.first_item_keys = Object.keys(json[key][0]).slice(0, 40);
+          result.first_items = json[key].slice(0, 3);
+          break;
+        }
+      }
+    }
+
+    console.log(
+      `${response.status} ${contentType} ${text.length} bytes — ${path}`
+    );
+
+    return result;
+  } catch (error) {
+    const result = {
+      url,
+      status: null,
+      content_type: "",
+      length: 0,
+      duration_ms: Date.now() - started,
+      error: String(error)
+    };
+
+    console.log(`ERROR — ${path} — ${error}`);
+    return result;
+  }
 }
 
-main().catch(e => {
-  console.error(e);
-  process.exit(1);
-});
+const results = [];
+
+for (const path of candidates) {
+  results.push(await test(path));
+}
+
+const output = {
+  generated_at: new Date().toISOString(),
+  base: BASE,
+  candidates,
+  results
+};
+
+const fs = await import("node:fs/promises");
+await fs.writeFile(
+  "doublagevf-diagnostic.json",
+  JSON.stringify(output, null, 2),
+  "utf8"
+);
+
+console.log("\nDiagnostic terminé.");
+console.log("Résultat écrit dans doublagevf-diagnostic.json");
