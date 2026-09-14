@@ -1,4 +1,4 @@
-import { discoverMovies, getMovie } from "./tmdb.js";
+import { getMovie } from "./tmdb.js";
 import { CONFIG } from "./config.js";
 import { getVerifiedVFIds, getVFRecord } from "./vf.js";
 
@@ -25,15 +25,37 @@ const EXCLUDED_GENRES = new Set([
 ]);
 
 function isForeign(movie) {
-  return String(movie?.original_language || "").toLowerCase() !== "fr";
+  return String(
+    movie?.original_language || ""
+  ).toLowerCase() !== "fr";
+}
+
+function getGenreIds(movie) {
+  if (Array.isArray(movie?.genre_ids)) {
+    return movie.genre_ids.map(Number);
+  }
+
+  if (Array.isArray(movie?.genres)) {
+    return movie.genres
+      .map(g => Number(g?.id))
+      .filter(Number.isInteger);
+  }
+
+  return [];
 }
 
 function isAllowed(movie) {
-  if (!movie?.id || !isForeign(movie)) return false;
+  if (!movie?.id) return false;
 
-  return !(movie.genre_ids || []).some(id =>
-    EXCLUDED_GENRES.has(id)
-  );
+  if (!isForeign(movie)) return false;
+
+  const genreIds = getGenreIds(movie);
+
+  if (genreIds.some(id => EXCLUDED_GENRES.has(id))) {
+    return false;
+  }
+
+  return true;
 }
 
 function score(movie) {
@@ -50,9 +72,13 @@ function score(movie) {
 
   let voteBonus = 0;
 
-  if (votes >= 10000) voteBonus = 150;
-  else if (votes >= 5000) voteBonus = 100;
-  else if (votes >= 1000) voteBonus = 50;
+  if (votes >= 10000) {
+    voteBonus = 150;
+  } else if (votes >= 5000) {
+    voteBonus = 100;
+  } else if (votes >= 1000) {
+    voteBonus = 50;
+  }
 
   return popularity + rating + voteBonus;
 }
@@ -61,7 +87,9 @@ function toMeta(movie, vfRecord) {
   return {
     id: `tmdb-${movie.id}`,
     type: "movie",
-    name: movie.title || movie.original_title,
+    name:
+      movie.title ||
+      movie.original_title,
 
     poster: movie.poster_path
       ? `${IMAGE_BASE}${movie.poster_path}`
@@ -71,16 +99,29 @@ function toMeta(movie, vfRecord) {
       ? `${BACKDROP_BASE}${movie.backdrop_path}`
       : undefined,
 
-    description: movie.overview || "",
-    releaseInfo: movie.release_date || "",
-    imdbRating: movie.vote_average || undefined,
+    description:
+      movie.overview || "",
+
+    releaseInfo:
+      movie.release_date || "",
+
+    imdbRating:
+      movie.vote_average || undefined,
+
+    genres:
+      Array.isArray(movie.genres)
+        ? movie.genres.map(g => g.name)
+        : [],
+
     posterShape: "poster",
 
     meta: {
       tmdb_id: movie.id,
       vf: true,
-      vf_country: vfRecord?.vf_country || "FR",
-      vf_source: vfRecord?.source || "DoublageVF"
+      vf_country:
+        vfRecord?.vf_country || "FR",
+      vf_source:
+        vfRecord?.source || "DoublageVF"
     }
   };
 }
@@ -93,12 +134,14 @@ async function loadVFIndex() {
     return indexCache;
   }
 
-  const ids = await getVerifiedVFIds();
+  const ids =
+    await getVerifiedVFIds();
 
   const records = [];
 
   for (const id of ids) {
-    const record = await getVFRecord(id);
+    const record =
+      await getVFRecord(id);
 
     if (record) {
       records.push(record);
@@ -117,10 +160,14 @@ async function getMovieDetails(tmdbId) {
   }
 
   try {
-    const movie = await getMovie(tmdbId);
+    const movie =
+      await getMovie(tmdbId);
 
     if (movie) {
-      detailsCache.set(tmdbId, movie);
+      detailsCache.set(
+        tmdbId,
+        movie
+      );
     }
 
     return movie;
@@ -142,22 +189,33 @@ async function enrichRecords(records) {
     i < records.length;
     i += DETAILS_BATCH
   ) {
-    const batch = records.slice(
-      i,
-      i + DETAILS_BATCH
-    );
+    const batch =
+      records.slice(
+        i,
+        i + DETAILS_BATCH
+      );
 
-    const movies = await Promise.all(
-      batch.map(record =>
-        getMovieDetails(record.tmdb_id)
-      )
-    );
+    const movies =
+      await Promise.all(
+        batch.map(record =>
+          getMovieDetails(
+            record.tmdb_id
+          )
+        )
+      );
 
-    for (let j = 0; j < movies.length; j++) {
+    for (
+      let j = 0;
+      j < movies.length;
+      j++
+    ) {
       const movie = movies[j];
 
       if (!movie) continue;
-      if (!isAllowed(movie)) continue;
+
+      if (!isAllowed(movie)) {
+        continue;
+      }
 
       result.push({
         movie,
@@ -180,9 +238,8 @@ function sortNewest(a, b) {
 }
 
 export async function buildCatalog(catalogId) {
-  const cacheKey = catalogId;
-
-  const cached = catalogCache.get(cacheKey);
+  const cached =
+    catalogCache.get(catalogId);
 
   if (
     cached &&
@@ -191,61 +248,153 @@ export async function buildCatalog(catalogId) {
     return cached.items;
   }
 
-  const records = await loadVFIndex();
+  const records =
+    await loadVFIndex();
 
   if (!records.length) {
     return [];
   }
 
-  /*
-   * On part maintenant DIRECTEMENT de l'index VF.
-   * TMDB ne sert qu'à enrichir et filtrer les films.
-   */
-  const enriched = await enrichRecords(records);
+  const enriched =
+    await enrichRecords(records);
 
   let filtered = enriched;
 
   /*
-   * Nouveautés VF 2026 :
-   * films dont la sortie cinéma/film est en 2026.
+   * NOUVEAUTÉS VF 2026
    */
-  if (catalogId === "nouveautes-vf-2026") {
-    filtered = enriched.filter(
-      ({ movie }) =>
-        String(movie.release_date || "")
-          .startsWith("2026")
-    );
+  if (
+    catalogId ===
+    "nouveautes-vf-2026"
+  ) {
+    filtered =
+      enriched.filter(
+        ({ movie, vfRecord }) => {
 
-    filtered.sort(sortNewest);
+          const movieYear =
+            String(
+              movie.release_date || ""
+            ).slice(0, 4);
+
+          const vfYear =
+            String(
+              vfRecord?.year || ""
+            );
+
+          return (
+            movieYear === "2026" ||
+            vfYear === "2026"
+          );
+        }
+      );
+
+    filtered.sort(
+      (a, b) => {
+
+        const yearA =
+          Number(
+            a.vfRecord?.year ||
+            String(
+              a.movie.release_date ||
+              ""
+            ).slice(0, 4) ||
+            0
+          );
+
+        const yearB =
+          Number(
+            b.vfRecord?.year ||
+            String(
+              b.movie.release_date ||
+              ""
+            ).slice(0, 4) ||
+            0
+          );
+
+        if (yearB !== yearA) {
+          return yearB - yearA;
+        }
+
+        return sortNewest(a, b);
+      }
+    );
   }
 
   /*
    * VF 2025
    */
-  else if (catalogId === "vf-2025") {
-    filtered = enriched.filter(
-      ({ movie }) =>
-        String(movie.release_date || "")
-          .startsWith("2025")
-    );
+  else if (
+    catalogId === "vf-2025"
+  ) {
+    filtered =
+      enriched.filter(
+        ({ movie, vfRecord }) => {
 
-    filtered.sort(sortNewest);
+          const movieYear =
+            String(
+              movie.release_date || ""
+            ).slice(0, 4);
+
+          const vfYear =
+            String(
+              vfRecord?.year || ""
+            );
+
+          return (
+            movieYear === "2025" ||
+            vfYear === "2025"
+          );
+        }
+      );
+
+    filtered.sort(
+      (a, b) => {
+
+        const yearA =
+          Number(
+            a.vfRecord?.year ||
+            String(
+              a.movie.release_date ||
+              ""
+            ).slice(0, 4) ||
+            0
+          );
+
+        const yearB =
+          Number(
+            b.vfRecord?.year ||
+            String(
+              b.movie.release_date ||
+              ""
+            ).slice(0, 4) ||
+            0
+          );
+
+        if (yearB !== yearA) {
+          return yearB - yearA;
+        }
+
+        return sortNewest(a, b);
+      }
+    );
   }
 
   /*
-   * Catalogues par genre
+   * CATALOGUES PAR GENRE
    */
   else {
     const genreId =
       CONFIG.genreMap[catalogId];
 
     if (genreId) {
-      filtered = enriched.filter(
-        ({ movie }) =>
-          (movie.genre_ids || []).includes(
-            genreId
-          )
-      );
+      filtered =
+        enriched.filter(
+          ({ movie }) =>
+            getGenreIds(movie)
+              .includes(
+                Number(genreId)
+              )
+        );
     }
 
     filtered.sort(
@@ -255,16 +404,27 @@ export async function buildCatalog(catalogId) {
     );
   }
 
-  const items = filtered
-    .slice(0, CONFIG.maxResults)
-    .map(({ movie, vfRecord }) =>
-      toMeta(movie, vfRecord)
-    );
+  const items =
+    filtered
+      .slice(
+        0,
+        CONFIG.maxResults
+      )
+      .map(
+        ({ movie, vfRecord }) =>
+          toMeta(
+            movie,
+            vfRecord
+          )
+      );
 
-  catalogCache.set(cacheKey, {
-    time: Date.now(),
-    items
-  });
+  catalogCache.set(
+    catalogId,
+    {
+      time: Date.now(),
+      items
+    }
+  );
 
   return items;
 }
