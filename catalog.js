@@ -7,6 +7,33 @@ const BACKDROP_BASE = "https://image.tmdb.org/t/p/w1280";
 const BETTERPOSTER_BASE =
   "https://btttr.cc/poster-qa/imdb/poster-default";
 
+// Cache TMDB en mémoire.
+// Il évite de refaire les mêmes appels pendant 5 minutes.
+const MOVIE_CACHE_TTL = 5 * 60 * 1000;
+const movieCache = new Map();
+
+async function getCachedMovie(tmdbId) {
+  const cached = movieCache.get(tmdbId);
+
+  if (cached && Date.now() - cached.time < MOVIE_CACHE_TTL) {
+    return cached.movie;
+  }
+
+  try {
+    const movie = await getMovie(tmdbId);
+
+    movieCache.set(tmdbId, {
+      movie,
+      time: Date.now()
+    });
+
+    return movie;
+  } catch (error) {
+    movieCache.delete(tmdbId);
+    throw error;
+  }
+}
+
 function getYear(movie, vfRecord) {
   if (movie.release_date) {
     return Number(movie.release_date.slice(0, 4));
@@ -21,11 +48,11 @@ function getYear(movie, vfRecord) {
 
 function getGenres(movie) {
   if (Array.isArray(movie.genre_ids)) {
-    return movie.genre_ids;
+    return movie.genre_ids.map(Number);
   }
 
   if (Array.isArray(movie.genres)) {
-    return movie.genres.map((g) => g.id);
+    return movie.genres.map((g) => Number(g.id));
   }
 
   return [];
@@ -37,8 +64,11 @@ function scoreMovie(movie, vfRecord) {
 
   let score = 0;
 
-  if (year === currentYear) score += 1000;
-  else if (year === currentYear - 1) score += 400;
+  if (year === currentYear) {
+    score += 1000;
+  } else if (year === currentYear - 1) {
+    score += 400;
+  }
 
   if (movie.popularity) {
     score += Math.min(movie.popularity * 4, 500);
@@ -48,9 +78,13 @@ function scoreMovie(movie, vfRecord) {
     score += movie.vote_average * 10;
   }
 
-  if (movie.vote_count >= 1000) score += 150;
-  else if (movie.vote_count >= 500) score += 100;
-  else if (movie.vote_count >= 100) score += 50;
+  if (movie.vote_count >= 1000) {
+    score += 150;
+  } else if (movie.vote_count >= 500) {
+    score += 100;
+  } else if (movie.vote_count >= 100) {
+    score += 50;
+  }
 
   return score;
 }
@@ -104,6 +138,37 @@ function toMeta(movie, vfRecord) {
   };
 }
 
+// Traitement parallèle limité pour garder un chargement raisonnable.
+async function mapWithConcurrency(items, concurrency, mapper) {
+  const results = new Array(items.length);
+  let nextIndex = 0;
+
+  async function worker() {
+    while (true) {
+      const index = nextIndex++;
+
+      if (index >= items.length) {
+        return;
+      }
+
+      try {
+        results[index] = await mapper(items[index], index);
+      } catch (error) {
+        console.error(`Item ${items[index]} error:`, error);
+        results[index] = null;
+      }
+    }
+  }
+
+  const workers = Math.min(concurrency, items.length);
+
+  await Promise.all(
+    Array.from({ length: workers }, () => worker())
+  );
+
+  return results;
+}
+
 export async function buildCatalog(catalogId) {
   const verifiedIds = await getVerifiedVFIds();
 
@@ -111,19 +176,26 @@ export async function buildCatalog(catalogId) {
     return [];
   }
 
-  const results = [];
+  const ids = [...verifiedIds];
 
-  for (const tmdbId of verifiedIds) {
-    try {
-      const movie = await getMovie(tmdbId);
+  // 10 appels TMDB simultanés :
+  // beaucoup plus rapide que les appels un par un,
+  // sans envoyer une rafale incontrôlée.
+  const processed = await mapWithConcurrency(
+    ids,
+    10,
+    async (tmdbId) => {
+      const movie = await getCachedMovie(tmdbId);
 
-      if (!movie) continue;
+      if (!movie) {
+        return null;
+      }
 
       // Films étrangers uniquement
       if (
         String(movie.original_language || "").toLowerCase() === "fr"
       ) {
-        continue;
+        return null;
       }
 
       const genres = getGenres(movie);
@@ -134,7 +206,7 @@ export async function buildCatalog(catalogId) {
           CONFIG.excludedMovieGenres.has(Number(genreId))
         )
       ) {
-        continue;
+        return null;
       }
 
       // Horreur VF
@@ -142,10 +214,11 @@ export async function buildCatalog(catalogId) {
         catalogId === "horreur" &&
         !genres.includes(27)
       ) {
-        continue;
+        return null;
       }
 
       const vfRecord = await getVFRecord(tmdbId);
+
       const year = getYear(movie, vfRecord);
       const currentYear = new Date().getFullYear();
 
@@ -154,25 +227,25 @@ export async function buildCatalog(catalogId) {
         catalogId === "nouveautes-vf" &&
         year !== currentYear
       ) {
-        continue;
+        return null;
       }
 
-      results.push({
+      return {
         movie,
         vfRecord,
         score: scoreMovie(movie, vfRecord)
-      });
-
-    } catch (error) {
-      console.error(`Movie ${tmdbId} error:`, error);
+      };
     }
-  }
+  );
+
+  const results = processed.filter(Boolean);
 
   results.sort((a, b) => b.score - a.score);
 
-  return results
-    .slice(0, CONFIG.maxResults)
-    .map(({ movie, vfRecord }) =>
-      toMeta(movie, vfRecord)
-    );
+  // IMPORTANT :
+  // aucun .slice(0, 40)
+  // Tous les films admissibles sont conservés.
+  return results.map(({ movie, vfRecord }) =>
+    toMeta(movie, vfRecord)
+  );
 }
