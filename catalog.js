@@ -4,6 +4,8 @@ import { getVerifiedVFIds, getVFRecord } from "./vf.js";
 
 const IMAGE_BASE = "https://image.tmdb.org/t/p/w500";
 const BACKDROP_BASE = "https://image.tmdb.org/t/p/w1280";
+const BETTERPOSTER_BASE =
+  "https://btttr.cc/poster-qa/imdb/poster-default";
 
 function getYear(movie, vfRecord) {
   if (movie.release_date) {
@@ -53,26 +55,47 @@ function scoreMovie(movie, vfRecord) {
   return score;
 }
 
+function getPoster(movie) {
+  const imdbId = movie.imdb_id || null;
+
+  if (imdbId) {
+    return `${BETTERPOSTER_BASE}/${encodeURIComponent(imdbId)}.jpg?lang=fr`;
+  }
+
+  if (movie.poster_path) {
+    return `${IMAGE_BASE}${movie.poster_path}`;
+  }
+
+  return undefined;
+}
+
 function toMeta(movie, vfRecord) {
   return {
     id: `tmdb:${movie.id}`,
     type: "movie",
     name: movie.title || movie.original_title,
-    poster: movie.poster_path
-      ? `${IMAGE_BASE}${movie.poster_path}`
-      : undefined,
+
+    // BetterPoster directement dans le catalogue standalone
+    poster: getPoster(movie),
+
     background: movie.backdrop_path
       ? `${BACKDROP_BASE}${movie.backdrop_path}`
       : undefined,
+
     description: movie.overview || "",
     releaseInfo: movie.release_date || "",
     imdbRating: movie.vote_average || undefined,
+
     genres: Array.isArray(movie.genres)
       ? movie.genres.map((g) => g.name)
       : [],
+
     posterShape: "poster",
+
     meta: {
       tmdb_id: movie.id,
+      imdb_id: movie.imdb_id || null,
+      original_title: movie.original_title,
       vf: true,
       vf_country: vfRecord?.vf_country || "FR",
       vf_source: vfRecord?.source || "DoublageVF",
@@ -115,7 +138,10 @@ export async function buildCatalog(catalogId) {
       }
 
       // Horreur VF
-      if (catalogId === "horreur" && !genres.includes(27)) {
+      if (
+        catalogId === "horreur" &&
+        !genres.includes(27)
+      ) {
         continue;
       }
 
@@ -124,7 +150,10 @@ export async function buildCatalog(catalogId) {
       const currentYear = new Date().getFullYear();
 
       // Nouveautés VF = année courante
-      if (catalogId === "nouveautes-vf" && year !== currentYear) {
+      if (
+        catalogId === "nouveautes-vf" &&
+        year !== currentYear
+      ) {
         continue;
       }
 
@@ -133,6 +162,7 @@ export async function buildCatalog(catalogId) {
         vfRecord,
         score: scoreMovie(movie, vfRecord)
       });
+
     } catch (error) {
       console.error(`Movie ${tmdbId} error:`, error);
     }
@@ -142,5 +172,7 @@ export async function buildCatalog(catalogId) {
 
   return results
     .slice(0, CONFIG.maxResults)
-    .map(({ movie, vfRecord }) => toMeta(movie, vfRecord));
+    .map(({ movie, vfRecord }) =>
+      toMeta(movie, vfRecord)
+    );
 }
