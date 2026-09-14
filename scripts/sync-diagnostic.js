@@ -1,79 +1,123 @@
 import fs from "node:fs/promises";
 
 const BASE = "https://doublagevf.fr";
-const candidates = [
-  "/",
-  "/works",
-  "/works?page=1",
-  "/works/1",
-  "/works/page/1",
-  "/works?p=1",
-  "/works?pg=1",
-  "/oeuvres",
-  "/oeuvres?page=1",
-  "/films",
-  "/films?page=1"
-];
+const candidates = ["/", "/works", "/works?page=1"];
 
-async function fetchText(path) {
-  const url = BASE + path;
+async function fetchText(url) {
   const r = await fetch(url, {
     redirect: "follow",
     headers: {
-      "user-agent": "Mozilla/5.0 (compatible; Films-VF-Nuvio-Diagnostic/1.0)"
+      "user-agent": "Mozilla/5.0 (compatible; Films-VF-Nuvio-Diagnostic/2.0)"
     }
   });
   const text = await r.text();
-  return { url: r.url, status: r.status, type: r.headers.get("content-type") || "", text };
+  return {
+    requested: url,
+    url: r.url,
+    status: r.status,
+    type: r.headers.get("content-type") || "",
+    text
+  };
 }
 
-function inspect(html) {
-  const hrefs = [];
-  const re = /href=["']([^"'#]+)["']/gi;
+function extractScriptSources(html, baseUrl) {
+  const out = new Set();
+  const re = /<script[^>]+src=["']([^"']+)["']/gi;
   for (const m of html.matchAll(re)) {
-    if (!hrefs.includes(m[1])) hrefs.push(m[1]);
+    try { out.add(new URL(m[1], baseUrl).href); } catch {}
+  }
+  return [...out];
+}
+
+function extractAssetSources(html, baseUrl) {
+  const out = new Set();
+  const re = /<(?:link|script)[^>]+(?:href|src)=["']([^"']+)["']/gi;
+  for (const m of html.matchAll(re)) {
+    if (/\.(?:js|mjs)(?:\?|$)/i.test(m[1]) || /modulepreload/i.test(m[0])) {
+      try { out.add(new URL(m[1], baseUrl).href); } catch {}
+    }
+  }
+  return [...out];
+}
+
+function inspectAppJs(text, url) {
+  const urls = new Set();
+  const patterns = [
+    /https?:\/\/[^"'`\s)]+/gi,
+    /["'`]\/(?:api|graphql|trpc|v1|v2|v3)\/[^"'`\s)]*/gi,
+    /["'`]\/[^"'`\s)]*(?:works|work|oeuvres|search|catalog|catalogue|tmdb)[^"'`\s)]*/gi
+  ];
+  for (const re of patterns) {
+    for (const m of text.matchAll(re)) urls.add(m[0]);
   }
 
-  const workHrefs = hrefs.filter(x => /\/work\//i.test(x));
-  const interesting = hrefs.filter(x =>
-    /work|oeuv|film|annuaire|page=|p=|pg=/i.test(x)
-  ).slice(0, 80);
+  const interestingStrings = [];
+  const stringRe = /["'`]([^"'`\n]{1,220})["'`]/g;
+  for (const m of text.matchAll(stringRe)) {
+    const s = m[1];
+    if (/api|graphql|works|work|oeuvre|search|catalog|supabase|firebase|tmdb/i.test(s)) {
+      interestingStrings.push(s);
+    }
+    if (interestingStrings.length >= 120) break;
+  }
 
   return {
-    length: html.length,
-    title: (html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] || "").replace(/\s+/g," ").trim(),
-    workHrefs: workHrefs.slice(0, 20),
-    interesting,
-    hasFilm2026: /\bFilm\s+2026\b/i.test(html),
-    hasDoublage: /Doublage français/i.test(html),
-    hasCloudflare: /cloudflare|just a moment|attention required/i.test(html)
+    url,
+    length: text.length,
+    endpointCandidates: [...urls].slice(0, 150),
+    interestingStrings,
+    hasFetch: /\bfetch\s*\(/i.test(text),
+    hasAxios: /axios/i.test(text),
+    hasGraphql: /graphql/i.test(text),
+    hasSupabase: /supabase/i.test(text),
+    hasFirebase: /firebase/i.test(text),
+    hasTmdb: /themoviedb|tmdb/i.test(text)
   };
 }
 
 async function main() {
-  const out = [];
+  const pages = [];
+  const assetUrls = new Set();
+
   for (const path of candidates) {
+    const r = await fetchText(BASE + path);
+    const scripts = extractScriptSources(r.text, r.url);
+    const assets = extractAssetSources(r.text, r.url);
+    scripts.forEach(x => assetUrls.add(x));
+    assets.forEach(x => assetUrls.add(x));
+
+    pages.push({
+      path,
+      status: r.status,
+      finalUrl: r.url,
+      contentType: r.type,
+      length: r.text.length,
+      title: (r.text.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] || "").replace(/\s+/g, " ").trim(),
+      scriptUrls: scripts,
+      assetUrls: assets
+    });
+  }
+
+  const appAssets = [];
+  for (const url of assetUrls) {
     try {
-      const r = await fetchText(path);
-      const info = inspect(r.text);
-      console.log(`\n=== ${path} ===`);
-      console.log(`status=${r.status} final=${r.url}`);
-      console.log(`content-type=${r.type} length=${info.length}`);
-      console.log(`title=${info.title}`);
-      console.log(`work links=${info.workHrefs.length}`);
-      console.log(`film2026=${info.hasFilm2026} doublage=${info.hasDoublage} cloudflare=${info.hasCloudflare}`);
-      if (info.interesting.length) console.log("interesting hrefs:", info.interesting.join(" | "));
-      out.push({ path, ...r, info, text: undefined });
+      const r = await fetchText(url);
+      if (!/javascript|ecmascript|text\/plain/i.test(r.type) && !/\.(?:js|mjs)(?:\?|$)/i.test(url)) continue;
+      console.log(`Asset ${url}: ${r.status}, ${r.text.length} bytes`);
+      appAssets.push(inspectAppJs(r.text, url));
     } catch (e) {
-      console.log(`\n=== ${path} ===`);
-      console.log(`ERROR ${e.message}`);
-      out.push({ path, error: e.message });
+      appAssets.push({ url, error: e.message });
     }
   }
 
   await fs.writeFile(
     "doublagevf-diagnostic.json",
-    JSON.stringify(out, null, 2) + "\n"
+    JSON.stringify({
+      generated_at: new Date().toISOString(),
+      pages,
+      assetUrls: [...assetUrls],
+      appAssets
+    }, null, 2) + "\n"
   );
 }
 
