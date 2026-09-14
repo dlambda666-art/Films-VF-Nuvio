@@ -5,7 +5,7 @@ import { getVerifiedVFIds, getVFRecord } from "./vf.js";
 const IMAGE_BASE = "https://image.tmdb.org/t/p/w500";
 const BACKDROP_BASE = "https://image.tmdb.org/t/p/w1280";
 
-const CACHE_TTL = 30 * 60 * 1000;
+const CACHE_TTL = 15 * 60 * 1000;
 const DETAILS_BATCH = 20;
 
 let catalogCache = new Map();
@@ -25,9 +25,7 @@ const EXCLUDED_GENRES = new Set([
 ]);
 
 function isForeign(movie) {
-  return String(
-    movie?.original_language || ""
-  ).toLowerCase() !== "fr";
+  return String(movie?.original_language || "").toLowerCase() !== "fr";
 }
 
 function getGenreIds(movie) {
@@ -44,6 +42,19 @@ function getGenreIds(movie) {
   return [];
 }
 
+function getYear(movie, vfRecord) {
+  const movieYear = Number(
+    String(movie?.release_date || "").slice(0, 4)
+  );
+
+  const vfYear = Number(vfRecord?.year || 0);
+
+  if (movieYear >= 1900) return movieYear;
+  if (vfYear >= 1900) return vfYear;
+
+  return 0;
+}
+
 function isAllowed(movie) {
   if (!movie?.id) return false;
 
@@ -58,35 +69,84 @@ function isAllowed(movie) {
   return true;
 }
 
-function score(movie) {
+/*
+ * Classement général :
+ *
+ * 1. Films récents fortement privilégiés
+ * 2. Popularité
+ * 3. Nombre de votes
+ * 4. Note
+ *
+ * Les anciens films restent possibles si la VF existe,
+ * mais ils passent derrière les films récents.
+ */
+function score(movie, vfRecord) {
+  const year = getYear(movie, vfRecord);
+
+  let yearBonus = 0;
+
+  if (year === 2026) {
+    yearBonus = 1400;
+  } else if (year === 2025) {
+    yearBonus = 1100;
+  } else if (year === 2024) {
+    yearBonus = 800;
+  } else if (year === 2023) {
+    yearBonus = 550;
+  } else if (year === 2022) {
+    yearBonus = 350;
+  } else if (year === 2021) {
+    yearBonus = 200;
+  } else if (year >= 2018) {
+    yearBonus = 100;
+  }
+
   const popularity = Math.min(
-    Number(movie.popularity || 0) * 4,
-    500
+    Number(movie.popularity || 0) * 5,
+    650
   );
 
   const rating =
-    Number(movie.vote_average || 0) * 10;
+    Number(movie.vote_average || 0) * 12;
 
   const votes =
     Number(movie.vote_count || 0);
 
   let voteBonus = 0;
 
-  if (votes >= 10000) {
-    voteBonus = 150;
+  if (votes >= 20000) {
+    voteBonus = 220;
+  } else if (votes >= 10000) {
+    voteBonus = 180;
   } else if (votes >= 5000) {
-    voteBonus = 100;
+    voteBonus = 130;
+  } else if (votes >= 2000) {
+    voteBonus = 80;
   } else if (votes >= 1000) {
-    voteBonus = 50;
+    voteBonus = 40;
   }
 
-  return popularity + rating + voteBonus;
+  return (
+    yearBonus +
+    popularity +
+    rating +
+    voteBonus
+  );
+}
+
+function releaseTimestamp(movie) {
+  const date = String(movie?.release_date || "");
+
+  const timestamp = Date.parse(date);
+
+  return Number.isNaN(timestamp) ? 0 : timestamp;
 }
 
 function toMeta(movie, vfRecord) {
   return {
     id: `tmdb-${movie.id}`,
     type: "movie",
+
     name:
       movie.title ||
       movie.original_title,
@@ -121,7 +181,8 @@ function toMeta(movie, vfRecord) {
       vf_country:
         vfRecord?.vf_country || "FR",
       vf_source:
-        vfRecord?.source || "DoublageVF"
+        vfRecord?.source || "DoublageVF",
+      vf_verified: true
     }
   };
 }
@@ -227,14 +288,63 @@ async function enrichRecords(records) {
   return result;
 }
 
-function sortNewest(a, b) {
-  const dateA =
-    a.movie.release_date || "";
+/*
+ * Nouveautés :
+ *
+ * On utilise l'année du film, pas last_verified.
+ *
+ * last_verified = date de vérification de la base,
+ * PAS date de sortie VF.
+ *
+ * Donc on ne triche jamais en considérant une vérification
+ * comme une nouvelle sortie VF.
+ */
+function sortRecent(a, b) {
+  const yearA =
+    getYear(a.movie, a.vfRecord);
+
+  const yearB =
+    getYear(b.movie, b.vfRecord);
+
+  if (yearB !== yearA) {
+    return yearB - yearA;
+  }
 
   const dateB =
-    b.movie.release_date || "";
+    releaseTimestamp(b.movie);
 
-  return dateB.localeCompare(dateA);
+  const dateA =
+    releaseTimestamp(a.movie);
+
+  if (dateB !== dateA) {
+    return dateB - dateA;
+  }
+
+  return (
+    score(b.movie, b.vfRecord) -
+    score(a.movie, a.vfRecord)
+  );
+}
+
+/*
+ * Classement des genres :
+ * priorité aux films récents ET populaires.
+ */
+function sortGenre(a, b) {
+  const scoreA =
+    score(a.movie, a.vfRecord);
+
+  const scoreB =
+    score(b.movie, b.vfRecord);
+
+  if (scoreB !== scoreA) {
+    return scoreB - scoreA;
+  }
+
+  return (
+    releaseTimestamp(b.movie) -
+    releaseTimestamp(a.movie)
+  );
 }
 
 export async function buildCatalog(catalogId) {
@@ -248,6 +358,13 @@ export async function buildCatalog(catalogId) {
     return cached.items;
   }
 
+  /*
+   * Recharge périodiquement l'index VF.
+   *
+   * Cela permet au catalogue de rester vivant :
+   * nouveau film ajouté au vf-index.json =
+   * nouveau film potentiellement visible ici.
+   */
   const records =
     await loadVFIndex();
 
@@ -262,6 +379,12 @@ export async function buildCatalog(catalogId) {
 
   /*
    * NOUVEAUTÉS VF 2026
+   *
+   * Important :
+   * on ne prétend pas qu'un vieux film est "VF 2026"
+   * simplement parce qu'il vient d'être vérifié.
+   *
+   * Seuls les films 2026 sont donc affichés ici.
    */
   if (
     catalogId ===
@@ -269,55 +392,11 @@ export async function buildCatalog(catalogId) {
   ) {
     filtered =
       enriched.filter(
-        ({ movie, vfRecord }) => {
-
-          const movieYear =
-            String(
-              movie.release_date || ""
-            ).slice(0, 4);
-
-          const vfYear =
-            String(
-              vfRecord?.year || ""
-            );
-
-          return (
-            movieYear === "2026" ||
-            vfYear === "2026"
-          );
-        }
+        ({ movie, vfRecord }) =>
+          getYear(movie, vfRecord) === 2026
       );
 
-    filtered.sort(
-      (a, b) => {
-
-        const yearA =
-          Number(
-            a.vfRecord?.year ||
-            String(
-              a.movie.release_date ||
-              ""
-            ).slice(0, 4) ||
-            0
-          );
-
-        const yearB =
-          Number(
-            b.vfRecord?.year ||
-            String(
-              b.movie.release_date ||
-              ""
-            ).slice(0, 4) ||
-            0
-          );
-
-        if (yearB !== yearA) {
-          return yearB - yearA;
-        }
-
-        return sortNewest(a, b);
-      }
-    );
+    filtered.sort(sortRecent);
   }
 
   /*
@@ -328,55 +407,11 @@ export async function buildCatalog(catalogId) {
   ) {
     filtered =
       enriched.filter(
-        ({ movie, vfRecord }) => {
-
-          const movieYear =
-            String(
-              movie.release_date || ""
-            ).slice(0, 4);
-
-          const vfYear =
-            String(
-              vfRecord?.year || ""
-            );
-
-          return (
-            movieYear === "2025" ||
-            vfYear === "2025"
-          );
-        }
+        ({ movie, vfRecord }) =>
+          getYear(movie, vfRecord) === 2025
       );
 
-    filtered.sort(
-      (a, b) => {
-
-        const yearA =
-          Number(
-            a.vfRecord?.year ||
-            String(
-              a.movie.release_date ||
-              ""
-            ).slice(0, 4) ||
-            0
-          );
-
-        const yearB =
-          Number(
-            b.vfRecord?.year ||
-            String(
-              b.movie.release_date ||
-              ""
-            ).slice(0, 4) ||
-            0
-          );
-
-        if (yearB !== yearA) {
-          return yearB - yearA;
-        }
-
-        return sortNewest(a, b);
-      }
-    );
+    filtered.sort(sortRecent);
   }
 
   /*
@@ -390,18 +425,13 @@ export async function buildCatalog(catalogId) {
       filtered =
         enriched.filter(
           ({ movie }) =>
-            getGenreIds(movie)
-              .includes(
-                Number(genreId)
-              )
+            getGenreIds(movie).includes(
+              Number(genreId)
+            )
         );
     }
 
-    filtered.sort(
-      (a, b) =>
-        score(b.movie) -
-        score(a.movie)
-    );
+    filtered.sort(sortGenre);
   }
 
   const items =
