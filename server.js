@@ -1,7 +1,24 @@
 import express from "express";
+import { buildCatalog } from "./catalog.js";
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+const PORT = Number(process.env.PORT || 8080);
+
+const catalogs = [
+  ["nouveautes-vf-2026", "Nouveautés VF 2026"],
+  ["vf-2025", "VF 2025"],
+  ["action", "Action"],
+  ["thriller", "Thriller"],
+  ["horreur", "Horreur"],
+  ["science-fiction", "Science-fiction"],
+  ["fantastique", "Fantastique"],
+  ["aventure", "Aventure"],
+  ["crime-policier", "Crime/Policier"],
+  ["guerre", "Guerre"],
+  ["western", "Western"],
+  ["mystere", "Mystère"],
+  ["historique", "Historique"]
+];
 
 const manifest = {
   id: "films-vf-nuvio",
@@ -10,27 +27,29 @@ const manifest = {
   description: "Catalogue dynamique dédié aux films étrangers doublés en français.",
   resources: ["catalog", "meta"],
   types: ["movie"],
-  catalogs: [
-    { type: "movie", id: "nouveautes-vf-2026", name: "Nouveautés VF 2026" },
-    { type: "movie", id: "vf-2025", name: "VF 2025" },
-    { type: "movie", id: "action", name: "Action" },
-    { type: "movie", id: "thriller", name: "Thriller" },
-    { type: "movie", id: "horreur", name: "Horreur" },
-    { type: "movie", id: "science-fiction", name: "Science-fiction" },
-    { type: "movie", id: "fantastique", name: "Fantastique" },
-    { type: "movie", id: "aventure", name: "Aventure" },
-    { type: "movie", id: "crime-policier", name: "Crime/Policier" },
-    { type: "movie", id: "guerre", name: "Guerre" },
-    { type: "movie", id: "western", name: "Western" },
-    { type: "movie", id: "mystere", name: "Mystère" },
-    { type: "movie", id: "historique", name: "Historique" }
-  ]
+  catalogs: catalogs.map(([id, name]) => ({
+    type: "movie",
+    id,
+    name
+  }))
 };
 
-app.get("/manifest.json", (_req, res) => res.json(manifest));
+app.get("/manifest.json", (_req, res) => {
+  res.json(manifest);
+});
 
-app.get("/catalog/:type/:id.json", (_req, res) => {
-  res.json({ metas: [] });
+app.get("/catalog/:type/:id.json", async (req, res) => {
+  if (req.params.type !== "movie") {
+    return res.json({ metas: [] });
+  }
+
+  try {
+    const metas = await buildCatalog(req.params.id);
+    res.json({ metas });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ metas: [], error: "Catalog unavailable" });
+  }
 });
 
 app.get("/meta/:type/:id.json", (_req, res) => {
