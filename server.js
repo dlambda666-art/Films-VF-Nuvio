@@ -13,9 +13,12 @@ const catalogs = [
 const manifest = {
   id: "films-vf-nuvio",
   version: "1.0.1",
-  name: "Films VF Nuvio",
+  name: "FrenchPulse",
   description:
     "Catalogue dynamique dédié aux films étrangers doublés en français.",
+
+  logo:
+    "https://raw.githubusercontent.com/dlambda666-art/Films-VF-Nuvio/main/frenchpulse.jpg",
 
   resources: [
     "catalog",
@@ -73,7 +76,6 @@ app.get("/meta/:type/:id.json", async (req, res) => {
       });
     }
 
-    // Format Stremio correct
     res.json({ meta });
 
   } catch (error) {
@@ -87,12 +89,12 @@ app.get("/meta/:type/:id.json", async (req, res) => {
 
 app.get("/", (_req, res) => {
   res.type("text").send(
-    "Films VF Nuvio - addon running"
+    "FrenchPulse - addon running"
   );
 });
 
 app.listen(PORT, () => {
   console.log(
-    `Films VF Nuvio running on port ${PORT}`
+    `FrenchPulse running on port ${PORT}`
   );
 });
