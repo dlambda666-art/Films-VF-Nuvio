@@ -5,13 +5,20 @@ const INDEX_FILE = "vf-index.json";
 
 const PAGE_SIZE = Number(process.env.PAGE_SIZE || 50);
 const MAX_PAGES = Number(process.env.MAX_PAGES || 428);
-const CONCURRENCY = Number(process.env.CONCURRENCY || 8);
-const REQUEST_DELAY_MS = Number(process.env.REQUEST_DELAY_MS || 100);
+
+// DoublageVF limite rapidement les requêtes.
+// On reste volontairement très prudent.
+const CONCURRENCY = Number(process.env.CONCURRENCY || 2);
+const REQUEST_DELAY_MS = Number(process.env.REQUEST_DELAY_MS || 1200);
+
+const MAX_RETRIES = 6;
+const RETRY_BASE_MS = 5000;
+
 const FULL_SYNC = process.env.FULL_SYNC === "1";
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-async function getJson(path) {
+async function getJson(path, attempt = 0) {
   const response = await fetch(`${BASE}${path}`, {
     headers: {
       Accept: "application/json",
@@ -19,16 +26,47 @@ async function getJson(path) {
     }
   });
 
-  if (!response.ok) {
-    throw new Error(`${response.status} ${path}`);
+  if (response.ok) {
+    return response.json();
   }
 
-  return response.json();
+  const retryable =
+    response.status === 429 ||
+    response.status === 500 ||
+    response.status === 502 ||
+    response.status === 503 ||
+    response.status === 504;
+
+  if (retryable && attempt < MAX_RETRIES) {
+    const retryAfter = Number(
+      response.headers.get("retry-after")
+    );
+
+    const wait =
+      Number.isFinite(retryAfter) && retryAfter > 0
+        ? retryAfter * 1000
+        : RETRY_BASE_MS * Math.pow(2, attempt);
+
+    console.log(
+      `HTTP ${response.status} sur ${path} → attente ${Math.round(
+        wait / 1000
+      )}s puis nouvelle tentative (${attempt + 1}/${MAX_RETRIES})`
+    );
+
+    await sleep(wait);
+
+    return getJson(path, attempt + 1);
+  }
+
+  throw new Error(`${response.status} ${path}`);
 }
 
 async function fetchBrowsePage(page) {
   const skip = (page - 1) * PAGE_SIZE;
-  return getJson(`/works/browse?skip=${skip}&limit=${PAGE_SIZE}`);
+
+  return getJson(
+    `/works/browse?skip=${skip}&limit=${PAGE_SIZE}`
+  );
 }
 
 function isFilm(work) {
@@ -45,7 +83,8 @@ function isFilm(work) {
 function extractYear(value) {
   if (value == null) return null;
 
-  const match = String(value).match(/\b(19|20)\d{2}\b/);
+  const match = String(value).match(/\b(19|20)\d{2}\b`);
+
   return match ? Number(match[0]) : null;
 }
 
@@ -63,12 +102,14 @@ function findYear(obj) {
 
   for (const key of keys) {
     const year = extractYear(obj[key]);
+
     if (year) return year;
   }
 
   for (const value of Object.values(obj)) {
     if (value && typeof value === "object") {
       const year = findYear(value);
+
       if (year) return year;
     }
   }
@@ -117,12 +158,14 @@ function findTmdbId(obj) {
 
   for (const key of directKeys) {
     const id = extractTmdbId(obj[key]);
+
     if (id) return id;
   }
 
   for (const value of Object.values(obj)) {
     if (value && typeof value === "object") {
       const id = findTmdbId(value);
+
       if (id) return id;
     }
   }
@@ -140,9 +183,7 @@ async function resolveTmdb(work) {
     };
   }
 
-  /*
-   * On essaie d'abord la fiche complète DoublageVF.
-   */
+  // Fiche complète DoublageVF
   for (const route of [
     `/work/${encodeURIComponent(work.id)}`,
     `/works/${encodeURIComponent(work.id)}`
@@ -151,6 +192,7 @@ async function resolveTmdb(work) {
       const detail = await getJson(route);
 
       const tmdbId = findTmdbId(detail);
+
       const year =
         findYear(detail) ||
         findYear(work);
@@ -164,14 +206,12 @@ async function resolveTmdb(work) {
     } catch {}
   }
 
-  /*
-   * Dernier recours : recherche universelle DoublageVF.
-   * On récupère maintenant aussi l'année du résultat.
-   */
+  // Dernier recours : recherche universelle
   if (!work.title) return null;
 
   try {
     const q = encodeURIComponent(work.title);
+
     const data = await getJson(
       `/search/universal?q=${q}`
     );
@@ -247,6 +287,7 @@ async function mapWithConcurrency(
   concurrency
 ) {
   const results = new Array(items.length);
+
   let cursor = 0;
 
   async function run() {
@@ -344,6 +385,20 @@ async function main() {
         `Page ${page} failed:`,
         error.message
       );
+
+      // On arrête plutôt que de continuer
+      // à marteler DoublageVF après un rate-limit.
+      if (
+        String(error.message).startsWith("429")
+      ) {
+        console.error(
+          "Rate-limit DoublageVF persistant. " +
+          "Le prochain run pourra reprendre."
+        );
+
+        break;
+      }
+
       continue;
     }
 
@@ -372,6 +427,7 @@ async function main() {
             console.log(
               `TMDB introuvable: ${work.title}`
             );
+
             return null;
           }
 
@@ -402,10 +458,6 @@ async function main() {
       const previous =
         byTmdb.get(item.tmdb_id);
 
-      /*
-       * On conserve les anciennes données
-       * si la nouvelle réponse est incomplète.
-       */
       byTmdb.set(
         item.tmdb_id,
         {
@@ -452,6 +504,9 @@ async function main() {
     if (works.length < PAGE_SIZE) {
       break;
     }
+
+    // Pause supplémentaire entre les pages.
+    await sleep(REQUEST_DELAY_MS);
   }
 
   const items =
@@ -517,15 +572,19 @@ async function main() {
   );
 
   console.log("");
+
   console.log(
     `Œuvres scannées : ${scannedWorks}`
   );
+
   console.log(
     `Films trouvés   : ${filmWorks}`
   );
+
   console.log(
     `TMDB résolus    : ${resolved}`
   );
+
   console.log(
     `Index final     : ${items.length}`
   );
