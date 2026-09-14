@@ -1,13 +1,10 @@
-loimport { readFile, writeFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 
 const BASE = "https://doublagevf.fr/api";
 const INDEX_FILE = "vf-index.json";
 
 const PAGE_SIZE = Number(process.env.PAGE_SIZE || 50);
 const MAX_PAGES = Number(process.env.MAX_PAGES || 428);
-
-// DoublageVF limite rapidement les requêtes.
-// On reste volontairement très prudent.
 const CONCURRENCY = Number(process.env.CONCURRENCY || 2);
 const REQUEST_DELAY_MS = Number(process.env.REQUEST_DELAY_MS || 1200);
 
@@ -30,17 +27,10 @@ async function getJson(path, attempt = 0) {
     return response.json();
   }
 
-  const retryable =
-    response.status === 429 ||
-    response.status === 500 ||
-    response.status === 502 ||
-    response.status === 503 ||
-    response.status === 504;
+  const retryable = [429, 500, 502, 503, 504].includes(response.status);
 
   if (retryable && attempt < MAX_RETRIES) {
-    const retryAfter = Number(
-      response.headers.get("retry-after")
-    );
+    const retryAfter = Number(response.headers.get("retry-after"));
 
     const wait =
       Number.isFinite(retryAfter) && retryAfter > 0
@@ -48,9 +38,9 @@ async function getJson(path, attempt = 0) {
         : RETRY_BASE_MS * Math.pow(2, attempt);
 
     console.log(
-      `HTTP ${response.status} sur ${path} → attente ${Math.round(
+      `HTTP ${response.status} sur ${path} -> attente ${Math.round(
         wait / 1000
-      )}s puis nouvelle tentative (${attempt + 1}/${MAX_RETRIES})`
+      )}s (${attempt + 1}/${MAX_RETRIES})`
     );
 
     await sleep(wait);
@@ -72,9 +62,9 @@ async function fetchBrowsePage(page) {
 function isFilm(work) {
   const type = String(
     work?.type ||
-    work?.work_type ||
-    work?.media_type ||
-    ""
+      work?.work_type ||
+      work?.media_type ||
+      ""
   ).toUpperCase();
 
   return type === "FILM";
@@ -183,50 +173,51 @@ async function resolveTmdb(work) {
     };
   }
 
-  // Fiche complète DoublageVF
-  for (const route of [
-    `/work/${encodeURIComponent(work.id)}`,
-    `/works/${encodeURIComponent(work.id)}`
-  ]) {
-    try {
-      const detail = await getJson(route);
+  if (work?.id != null) {
+    for (const route of [
+      `/work/${encodeURIComponent(work.id)}`,
+      `/works/${encodeURIComponent(work.id)}`
+    ]) {
+      try {
+        const detail = await getJson(route);
 
-      const tmdbId = findTmdbId(detail);
+        const tmdbId = findTmdbId(detail);
 
-      const year =
-        findYear(detail) ||
-        findYear(work);
-
-      if (tmdbId) {
-        return {
-          tmdbId,
-          year
-        };
-      }
-    } catch {}
+        if (tmdbId) {
+          return {
+            tmdbId,
+            year:
+              findYear(detail) ||
+              findYear(work)
+          };
+        }
+      } catch {}
+    }
   }
 
-  // Dernier recours : recherche universelle
-  if (!work.title) return null;
+  if (!work?.title) return null;
 
   try {
-    const q = encodeURIComponent(work.title);
-
     const data = await getJson(
-      `/search/universal?q=${q}`
+      `/search/universal?q=${encodeURIComponent(work.title)}`
     );
 
-    const works = Array.isArray(data?.works)
-      ? data.works
-      : [];
+    const works = Array.isArray(data)
+      ? data
+      : Array.isArray(data?.works)
+        ? data.works
+        : [];
 
-    const filmWorks = works.filter(x =>
-      String(
-        x?.work_type ||
-        x?.type ||
-        ""
-      ).toUpperCase() === "FILM"
-    );
+    const filmWorks = works.filter(item => {
+      const type = String(
+        item?.work_type ||
+          item?.type ||
+          item?.media_type ||
+          ""
+      ).toUpperCase();
+
+      return !type || type === "FILM";
+    });
 
     if (!filmWorks.length) return null;
 
@@ -234,8 +225,8 @@ async function resolveTmdb(work) {
       .trim()
       .toLowerCase();
 
-    const exact = filmWorks.filter(x =>
-      String(x?.title || "")
+    const exact = filmWorks.filter(item =>
+      String(item?.title || "")
         .trim()
         .toLowerCase() === title
     );
@@ -248,23 +239,21 @@ async function resolveTmdb(work) {
 
     if (sourceYear) {
       const sameYear = pool.find(
-        x => findYear(x) === sourceYear
+        item => findYear(item) === sourceYear
       );
 
-      if (sameYear) {
-        const tmdbId = findTmdbId(sameYear);
+      const sameYearId = findTmdbId(sameYear);
 
-        if (tmdbId) {
-          return {
-            tmdbId,
-            year: sourceYear
-          };
-        }
+      if (sameYearId) {
+        return {
+          tmdbId: sameYearId,
+          year: sourceYear
+        };
       }
     }
 
     const candidate = pool.find(
-      x => findTmdbId(x)
+      item => findTmdbId(item)
     );
 
     if (!candidate) return null;
@@ -309,14 +298,14 @@ async function mapWithConcurrency(
     }
   }
 
+  const workers = Math.min(
+    Math.max(1, concurrency),
+    items.length
+  );
+
   await Promise.all(
     Array.from(
-      {
-        length: Math.min(
-          concurrency,
-          items.length
-        )
-      },
+      { length: workers },
       run
     )
   );
@@ -349,18 +338,20 @@ async function main() {
   const existingItems =
     await loadExisting();
 
-  const byTmdb = new Map(
-    existingItems
-      .filter(x =>
-        Number.isInteger(
-          Number(x?.tmdb_id)
-        )
-      )
-      .map(x => [
-        Number(x.tmdb_id),
-        x
-      ])
-  );
+  const byTmdb = new Map();
+
+  for (const item of existingItems) {
+    const tmdbId = Number(
+      item?.tmdb_id
+    );
+
+    if (
+      Number.isInteger(tmdbId) &&
+      tmdbId > 0
+    ) {
+      byTmdb.set(tmdbId, item);
+    }
+  }
 
   const pages = FULL_SYNC
     ? MAX_PAGES
@@ -386,14 +377,11 @@ async function main() {
         error.message
       );
 
-      // On arrête plutôt que de continuer
-      // à marteler DoublageVF après un rate-limit.
       if (
         String(error.message).startsWith("429")
       ) {
         console.error(
-          "Rate-limit DoublageVF persistant. " +
-          "Le prochain run pourra reprendre."
+          "Rate-limit DoublageVF persistant. Arrêt du scan."
         );
 
         break;
@@ -402,12 +390,17 @@ async function main() {
       continue;
     }
 
-    const works =
-      Array.isArray(payload?.works)
-        ? payload.works
+    const works = Array.isArray(
+      payload?.works
+    )
+      ? payload.works
+      : Array.isArray(payload)
+        ? payload
         : [];
 
-    if (!works.length) break;
+    if (!works.length) {
+      break;
+    }
 
     scannedWorks += works.length;
 
@@ -425,7 +418,11 @@ async function main() {
 
           if (!result?.tmdbId) {
             console.log(
-              `TMDB introuvable: ${work.title}`
+              `TMDB introuvable: ${
+                work.title ||
+                work.id ||
+                "sans titre"
+              }`
             );
 
             return null;
@@ -433,13 +430,27 @@ async function main() {
 
           resolved++;
 
+          const previous =
+            byTmdb.get(
+              result.tmdbId
+            );
+
           return {
-            id: work.id,
-            tmdb_id: result.tmdbId,
+            ...(previous || {}),
+            id:
+              work.id ??
+              previous?.id ??
+              null,
+            tmdb_id:
+              result.tmdbId,
             title:
-              work.title || null,
+              work.title ||
+              previous?.title ||
+              null,
             year:
-              result.year || null,
+              result.year ||
+              previous?.year ||
+              null,
             vf_confirmed: true,
             vf_country: "FR",
             source: "DoublageVF",
@@ -453,105 +464,95 @@ async function main() {
       );
 
     for (const item of resolvedPage) {
-      if (!item) continue;
-
-      const previous =
-        byTmdb.get(item.tmdb_id);
-
-      byTmdb.set(
-        item.tmdb_id,
-        {
-          ...previous,
-          ...item,
-          year:
-            item.year ||
-            previous?.year ||
-            null
-        }
-      );
+      if (item) {
+        byTmdb.set(
+          item.tmdb_id,
+          item
+        );
+      }
     }
 
     console.log(
       `Page ${page}/${pages}: ` +
-      `${works.length} œuvres, ` +
-      `${films.length} films, ` +
-      `${resolvedPage.filter(Boolean).length} TMDB résolus.`
+        `${works.length} œuvres, ` +
+        `${films.length} films, ` +
+        `${resolvedPage.filter(Boolean).length} TMDB résolus.`
     );
 
     const pagination =
       payload?.pagination;
 
-    if (pagination) {
-      const totalPages =
-        Number(
-          pagination.total_pages
-        ) ||
-        Number(
-          pagination.pages
-        ) ||
-        Number(
-          pagination.last_page
-        );
+    const totalPages = Number(
+      pagination?.total_pages ||
+        pagination?.pages ||
+        pagination?.last_page
+    );
 
-      if (
-        Number.isFinite(totalPages) &&
-        page >= totalPages
-      ) {
-        break;
-      }
+    if (
+      Number.isFinite(totalPages) &&
+      totalPages > 0 &&
+      page >= totalPages
+    ) {
+      break;
     }
 
     if (works.length < PAGE_SIZE) {
       break;
     }
 
-    // Pause supplémentaire entre les pages.
-    await sleep(REQUEST_DELAY_MS);
+    await sleep(
+      REQUEST_DELAY_MS
+    );
   }
 
   const items =
     [...byTmdb.values()]
-      .filter(x =>
-        Number.isInteger(
-          Number(x?.tmdb_id)
-        ) &&
-        Number(x.tmdb_id) > 0
+      .filter(
+        item =>
+          Number.isInteger(
+            Number(item?.tmdb_id)
+          ) &&
+          Number(item.tmdb_id) > 0
       )
-      .map(x => ({
-        id: x.id || null,
-        tmdb_id: Number(x.tmdb_id),
-        title: x.title || null,
+      .map(item => ({
+        id:
+          item.id || null,
+        tmdb_id:
+          Number(item.tmdb_id),
+        title:
+          item.title || null,
         year:
-          x.year
-            ? Number(x.year)
+          item.year
+            ? Number(item.year)
             : null,
         vf_confirmed: true,
         vf_country:
-          x.vf_country || "FR",
+          item.vf_country || "FR",
         source:
-          x.source || "DoublageVF",
+          item.source ||
+          "DoublageVF",
         confidence:
-          Number(x.confidence ?? 1),
-        status: "confirmed",
+          Number(
+            item.confidence ?? 1
+          ),
+        status:
+          "confirmed",
         last_verified:
-          x.last_verified ||
+          item.last_verified ||
           new Date().toISOString()
       }))
-      .sort((a, b) => {
-        const ay =
-          Number(a.year || 0);
-
-        const by =
-          Number(b.year || 0);
-
-        return (
-          by - ay ||
-          String(a.title || "")
-            .localeCompare(
-              String(b.title || "")
+      .sort(
+        (a, b) =>
+          Number(b.year || 0) -
+            Number(a.year || 0) ||
+          String(
+            a.title || ""
+          ).localeCompare(
+            String(
+              b.title || ""
             )
-        );
-      });
+          )
+      );
 
   const output = {
     version: 2,
@@ -572,19 +573,15 @@ async function main() {
   );
 
   console.log("");
-
   console.log(
     `Œuvres scannées : ${scannedWorks}`
   );
-
   console.log(
     `Films trouvés   : ${filmWorks}`
   );
-
   console.log(
     `TMDB résolus    : ${resolved}`
   );
-
   console.log(
     `Index final     : ${items.length}`
   );
