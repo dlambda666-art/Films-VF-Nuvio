@@ -14,6 +14,10 @@ const MAX_PAGES = FULL_SYNC ? 428 : 10;
 const PAGE_DELAY_MS = 3000;
 const TMDB_DELAY_MS = 150;
 const TMDB_CONCURRENCY = 5;
+
+const MAX_429_RETRIES = 3;
+const MAX_429_WAIT_MS = 30000;
+
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -31,11 +35,19 @@ function normalizeTitle(value) {
 function extractYear(value) {
   if (value == null) return null;
 
-  const match = String(value).match(
-    /\b(?:19|20)\d{2}\b/
-  );
+  const match = String(value).match(/\b(?:19|20)\d{2}\b/);
 
   return match ? Number(match[0]) : null;
+}
+
+function extractTitle(work) {
+  return (
+    work?.title ||
+    work?.name ||
+    work?.original_title ||
+    work?.originalTitle ||
+    null
+  );
 }
 
 function findYear(work) {
@@ -58,22 +70,12 @@ function findYear(work) {
   return null;
 }
 
-function extractTitle(work) {
-  return (
-    work?.title ||
-    work?.name ||
-    work?.original_title ||
-    work?.originalTitle ||
-    null
-  );
-}
-
 function isFilm(work) {
   const type = String(
     work?.type ||
-      work?.work_type ||
-      work?.media_type ||
-      ""
+    work?.work_type ||
+    work?.media_type ||
+    ""
   ).toUpperCase();
 
   return type === "FILM";
@@ -95,6 +97,7 @@ function extractTmdbId(value) {
 
     if (/^\d+$/.test(text)) {
       const id = Number(text);
+
       return id > 0 ? id : null;
     }
 
@@ -115,15 +118,13 @@ function findTmdbId(obj) {
     return null;
   }
 
-  const keys = [
+  for (const key of [
     "tmdb_id",
     "tmdbId",
     "tmdb_movie_id",
     "tmdbMovieId",
     "tmdb"
-  ];
-
-  for (const key of keys) {
+  ]) {
     const id = extractTmdbId(obj[key]);
 
     if (id) return id;
@@ -140,33 +141,30 @@ function findTmdbId(obj) {
   return null;
 }
 
-async function getDoublageVF(path) {
+async function fetchJson(url, label) {
   for (let attempt = 0; attempt <= MAX_429_RETRIES; attempt++) {
-    const response = await fetch(
-      `${DOUBLAGEVF_BASE}${path}`,
-      {
-        headers: {
-          Accept: "application/json",
-          "User-Agent": "Films-VF-Nuvio/1.0"
-        }
+    const response = await fetch(url, {
+      headers: {
+        Accept: "application/json",
+        "User-Agent": "Films-VF-Nuvio/1.0"
       }
-    );
+    });
 
     if (response.ok) {
       return response.json();
     }
 
-    if (response.status === 429) {
-      if (attempt >= MAX_429_RETRIES) {
-        throw new Error(`429 ${path}`);
-      }
-
+    if (
+      response.status === 429 &&
+      attempt < MAX_429_RETRIES
+    ) {
       const retryAfter = Number(
         response.headers.get("retry-after")
       );
 
       const wait =
-        Number.isFinite(retryAfter) && retryAfter > 0
+        Number.isFinite(retryAfter) &&
+        retryAfter > 0
           ? Math.min(
               retryAfter * 1000,
               MAX_429_WAIT_MS
@@ -174,7 +172,7 @@ async function getDoublageVF(path) {
           : MAX_429_WAIT_MS;
 
       console.log(
-        `DoublageVF 429 -> attente ${Math.round(
+        `${label}: 429 -> attente ${Math.round(
           wait / 1000
         )}s`
       );
@@ -184,11 +182,20 @@ async function getDoublageVF(path) {
     }
 
     throw new Error(
-      `${response.status} ${path}`
+      `${label}: HTTP ${response.status}`
     );
   }
 
-  throw new Error("DoublageVF request failed");
+  throw new Error(
+    `${label}: requête impossible`
+  );
+}
+
+async function getDoublageVF(path) {
+  return fetchJson(
+    `${DOUBLAGEVF_BASE}${path}`,
+    `DoublageVF ${path}`
+  );
 }
 
 async function getTMDB(path) {
@@ -212,125 +219,124 @@ async function getTMDB(path) {
     "fr-FR"
   );
 
-  const response = await fetch(url, {
-    headers: {
-      Accept: "application/json",
-      "User-Agent": "Films-VF-Nuvio/1.0"
-    }
-  });
-
-  if (!response.ok) {
-    throw new Error(
-      `TMDB ${response.status}`
-    );
-  }
-
-  return response.json();
+  return fetchJson(url, "TMDB");
 }
 
 const tmdbCache = new Map();
 
 async function searchTMDB(title, year) {
-  const key =
+  const cacheKey =
     `${normalizeTitle(title)}|${year || ""}`;
 
-  if (tmdbCache.has(key)) {
-    return tmdbCache.get(key);
+  if (tmdbCache.has(cacheKey)) {
+    return tmdbCache.get(cacheKey);
   }
+
+  const searches = [];
+
+  if (year) {
+    searches.push({
+      query: title,
+      year
+    });
+  }
+
+  searches.push({
+    query: title
+  });
 
   let result = null;
 
-  try {
-    const params = new URLSearchParams();
-
-    params.set(
-      "query",
-      title
-    );
-
-    params.set(
-      "include_adult",
-      "false"
-    );
-
-    if (year) {
-      params.set(
-        "year",
-        String(year)
-      );
-    }
-
-    const data = await getTMDB(
-      `/search/movie?${params.toString()}`
-    );
-
-    const results =
-      Array.isArray(data?.results)
-        ? data.results
-        : [];
-
-    const normalized =
-      normalizeTitle(title);
-
-    let candidates = results;
-
-    if (year) {
-      const sameYear =
-        results.filter(movie => {
-          const movieYear =
-            extractYear(
-              movie?.release_date
-            );
-
-          return movieYear === year;
-        });
-
-      if (sameYear.length) {
-        candidates = sameYear;
-      }
-    }
-
-    const exact =
-      candidates.find(movie => {
-        const a =
-          normalizeTitle(
-            movie?.title
-          );
-
-        const b =
-          normalizeTitle(
-            movie?.original_title
-          );
-
-        return (
-          a === normalized ||
-          b === normalized
-        );
+  for (const search of searches) {
+    try {
+      const params = new URLSearchParams({
+        query: search.query,
+        include_adult: "false"
       });
 
-    const candidate =
-      exact ||
-      candidates[0] ||
-      null;
+      if (search.year) {
+        params.set(
+          "year",
+          String(search.year)
+        );
+      }
 
-    if (candidate?.id) {
-      result = {
-        tmdb_id: Number(candidate.id),
-        year:
-          extractYear(
-            candidate.release_date
-          ) ||
-          year ||
-          null
-      };
+      const data = await getTMDB(
+        `/search/movie?${params.toString()}`
+      );
+
+      const results =
+        Array.isArray(data?.results)
+          ? data.results
+          : [];
+
+      if (!results.length) {
+        continue;
+      }
+
+      const wanted =
+        normalizeTitle(title);
+
+      const sameYear = year
+        ? results.filter(movie =>
+            extractYear(
+              movie?.release_date
+            ) === year
+          )
+        : results;
+
+      const candidates =
+        sameYear.length
+          ? sameYear
+          : results;
+
+      const exact =
+        candidates.find(movie => {
+          const titleA =
+            normalizeTitle(
+              movie?.title
+            );
+
+          const titleB =
+            normalizeTitle(
+              movie?.original_title
+            );
+
+          return (
+            titleA === wanted ||
+            titleB === wanted
+          );
+        });
+
+      const candidate =
+        exact ||
+        candidates[0];
+
+      if (candidate?.id) {
+        result = {
+          tmdb_id:
+            Number(candidate.id),
+          year:
+            extractYear(
+              candidate.release_date
+            ) ||
+            year ||
+            null
+        };
+
+        break;
+      }
+    } catch (error) {
+      console.log(
+        `TMDB recherche échouée: ${title} -> ${error.message}`
+      );
     }
-  } catch (error) {
-    console.log(
-      `TMDB recherche échouée: ${title} -> ${error.message}`
-    );
   }
 
-  tmdbCache.set(key, result);
+  tmdbCache.set(
+    cacheKey,
+    result
+  );
 
   return result;
 }
@@ -367,15 +373,16 @@ async function mapWithConcurrency(
     }
   }
 
-  const count = Math.min(
-    concurrency,
-    items.length
-  );
+  const count =
+    Math.min(
+      concurrency,
+      items.length
+    );
 
   await Promise.all(
     Array.from(
       { length: count },
-      runner
+      () => runner()
     )
   );
 
@@ -437,6 +444,22 @@ function pageSignature(works) {
     .join("|");
 }
 
+function normalizePayload(payload) {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  if (Array.isArray(payload?.works)) {
+    return payload.works;
+  }
+
+  if (Array.isArray(payload?.items)) {
+    return payload.items;
+  }
+
+  return [];
+}
+
 async function main() {
   console.log(
     "=== Films VF Nuvio ==="
@@ -450,7 +473,7 @@ async function main() {
   }
 
   console.log(
-    `TMDB API : OK`
+    "TMDB API : OK"
   );
 
   console.log(
@@ -459,6 +482,10 @@ async function main() {
         ? "FULL"
         : "standard"
     }`
+  );
+
+  console.log(
+    `Pages max : ${MAX_PAGES}`
   );
 
   const existing =
@@ -490,50 +517,54 @@ async function main() {
       payload =
         await getDoublageVF(
           `/works/browse?skip=${
-            (page - 1) * PAGE_SIZE
+            (page - 1) *
+            PAGE_SIZE
           }&limit=${PAGE_SIZE}`
         );
     } catch (error) {
       console.error(
         `Arrêt page ${page}: ${error.message}`
       );
+
       break;
     }
 
     const works =
-      Array.isArray(payload)
-        ? payload
-        : Array.isArray(payload?.works)
-          ? payload.works
-          : Array.isArray(payload?.items)
-            ? payload.items
-            : [];
+      normalizePayload(payload);
 
     if (!works.length) {
       console.log(
         `Page ${page}: vide -> fin`
       );
+
       break;
     }
 
     const signature =
       pageSignature(works);
 
-    if (signatures.has(signature)) {
+    if (
+      signatures.has(signature)
+    ) {
       console.log(
         `Page ${page}: contenu déjà rencontré -> fin du scan`
       );
+
       break;
     }
 
-    signatures.add(signature);
+    signatures.add(
+      signature
+    );
 
-    scanned += works.length;
+    scanned +=
+      works.length;
 
     const pageFilms =
       works.filter(isFilm);
 
-    films += pageFilms.length;
+    films +=
+      pageFilms.length;
 
     const pageResults =
       await mapWithConcurrency(
@@ -545,58 +576,76 @@ async function main() {
           const year =
             findYear(work);
 
+          if (!title) {
+            return null;
+          }
+
           let tmdbId =
             findTmdbId(work);
 
           let resolvedYear =
             year;
 
-          if (!tmdbId && title) {
+          if (tmdbId) {
+            resolved++;
+          } else {
             const found =
               await searchTMDB(
                 title,
                 year
               );
 
-            if (found) {
-              tmdbId =
-                found.tmdb_id;
-
-              resolvedYear =
-                found.year ||
-                year;
-
-              resolved++;
-            } else {
+            if (!found) {
               console.log(
-                `TMDB absent: ${title}`
+                `TMDB absent: ${title}${
+                  year
+                    ? ` (${year})`
+                    : ""
+                }`
               );
-            }
-          } else if (tmdbId) {
-            resolved++;
-          }
 
-          if (!tmdbId) {
-            return null;
+              return null;
+            }
+
+            tmdbId =
+              found.tmdb_id;
+
+            resolvedYear =
+              found.year ||
+              year;
+
+            resolved++;
           }
 
           return {
             id:
               work?.id ||
               null,
+
             tmdb_id:
               Number(tmdbId),
-            title:
-              title ||
-              null,
+
+            title,
+
             year:
               resolvedYear ||
               null,
-            vf_confirmed: true,
-            vf_country: "FR",
-            source: "DoublageVF",
-            confidence: 1,
-            status: "confirmed",
+
+            vf_confirmed:
+              true,
+
+            vf_country:
+              "FR",
+
+            source:
+              "DoublageVF",
+
+            confidence:
+              1,
+
+            status:
+              "confirmed",
+
             last_verified:
               new Date().toISOString()
           };
@@ -604,8 +653,12 @@ async function main() {
         TMDB_CONCURRENCY
       );
 
-    for (const item of pageResults) {
-      if (!item) continue;
+    for (
+      const item of pageResults
+    ) {
+      if (!item) {
+        continue;
+      }
 
       const previous =
         index.get(
@@ -617,6 +670,7 @@ async function main() {
         {
           ...(previous || {}),
           ...item,
+
           year:
             item.year ||
             previous?.year ||
@@ -636,7 +690,8 @@ async function main() {
     );
 
     if (
-      works.length < PAGE_SIZE
+      works.length <
+      PAGE_SIZE
     ) {
       break;
     }
@@ -661,28 +716,38 @@ async function main() {
         id:
           item.id ||
           null,
+
         tmdb_id:
           Number(item.tmdb_id),
+
         title:
           item.title ||
           null,
+
         year:
           item.year
             ? Number(item.year)
             : null,
-        vf_confirmed: true,
+
+        vf_confirmed:
+          true,
+
         vf_country:
           item.vf_country ||
           "FR",
+
         source:
           item.source ||
           "DoublageVF",
+
         confidence:
           Number(
             item.confidence ?? 1
           ),
+
         status:
           "confirmed",
+
         last_verified:
           item.last_verified ||
           new Date().toISOString()
@@ -699,15 +764,21 @@ async function main() {
         return String(
           a.title || ""
         ).localeCompare(
-          String(b.title || "")
+          String(
+            b.title || ""
+          )
         );
       });
 
   const output = {
     version: 2,
+
     updated_at:
       new Date().toISOString(),
-    source: "DoublageVF",
+
+    source:
+      "DoublageVF",
+
     items
   };
 
@@ -721,22 +792,26 @@ async function main() {
     "utf8"
   );
 
-  console.log("");
   console.log(
     "=== RESULTAT ==="
   );
+
   console.log(
     `Pages : ${pages}`
   );
+
   console.log(
     `Œuvres : ${scanned}`
   );
+
   console.log(
     `Films : ${films}`
   );
+
   console.log(
     `TMDB résolus : ${resolved}`
   );
+
   console.log(
     `Index final : ${items.length}`
   );
