@@ -70,7 +70,7 @@ app.get("/meta/:type/:id.json", async (req, res) => {
       });
     }
 
-    res.json(meta);
+   res.json({ meta });
   } catch (error) {
     console.error("Meta error:", error);
 
