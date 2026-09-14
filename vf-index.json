@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated_at": "2026-09-14T14:13:34.116Z",
+  "updated_at": "2026-09-14T14:18:51.745Z",
   "source": "DoublageVF",
   "items": [
     {
@@ -13,7 +13,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T11:11:22.843Z"
+      "last_verified": "2026-09-14T14:18:17.674Z"
     },
     {
       "id": "1061f836-1dc4-4006-b757-478cd2d829f5",
@@ -37,7 +37,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:13:28.241Z"
+      "last_verified": "2026-09-14T14:18:11.898Z"
     },
     {
       "id": "0876fd64-fb93-4cda-905b-c332b68412cf",
@@ -61,7 +61,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:13:29.793Z"
+      "last_verified": "2026-09-14T14:18:06.787Z"
     },
     {
       "id": "535ccac9-2a79-4cd5-815f-0c14b592c9d5",
@@ -73,7 +73,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:13:29.883Z"
+      "last_verified": "2026-09-14T14:18:27.248Z"
     },
     {
       "id": "85fa5b87-2dca-42d3-90ff-23d7dcdb9621",
@@ -85,7 +85,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:13:30.117Z"
+      "last_verified": "2026-09-14T14:18:37.088Z"
     },
     {
       "id": "ac654354-e7c8-49d0-8d43-875f8d71549f",
@@ -97,7 +97,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:13:28.246Z"
+      "last_verified": "2026-09-14T14:18:06.381Z"
     },
     {
       "id": "bb73f6a0-27ab-458a-9221-66c887060f20",
@@ -109,7 +109,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T11:11:27.924Z"
+      "last_verified": "2026-09-14T14:18:21.596Z"
     },
     {
       "id": "e1d727a4-d577-4f3e-8f7d-f6048f793535",
@@ -121,7 +121,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:13:28.709Z"
+      "last_verified": "2026-09-14T14:18:06.720Z"
     },
     {
       "id": "cf00bdd0-624d-47d1-9274-2f26ff6de5f8",
@@ -133,7 +133,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:13:29.642Z"
+      "last_verified": "2026-09-14T14:18:06.906Z"
     },
     {
       "id": "b322e4ac-fe2b-4e6a-878e-782a192fa6e6",
@@ -146,6 +146,330 @@
       "confidence": 1,
       "status": "confirmed",
       "last_verified": "2026-09-14T11:11:17.656Z"
+    },
+    {
+      "id": "c66007d7-28c1-4872-9534-6b128631f500",
+      "tmdb_id": 696393,
+      "title": "Cold Storage",
+      "year": 2026,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:11.241Z"
+    },
+    {
+      "id": "425285b1-8844-4e15-9113-0f857cb9231b",
+      "tmdb_id": 1418582,
+      "title": "Quinze Jours",
+      "year": 2026,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:11.246Z"
+    },
+    {
+      "id": "e73d7e12-7a78-4a6d-83ea-ce0ceb87ec22",
+      "tmdb_id": 614945,
+      "title": "Si tu m'écoutes",
+      "year": 2026,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:11.477Z"
+    },
+    {
+      "id": "3fca74cd-cf4a-428a-85dd-f6a1ff0bab9d",
+      "tmdb_id": 1510795,
+      "title": "Shake, Rattle & Roll: Les origines du mal",
+      "year": 2026,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:11.748Z"
+    },
+    {
+      "id": "bb6eb8b9-eafc-4773-8700-7fcb598f8952",
+      "tmdb_id": 1325734,
+      "title": "The Drama",
+      "year": 2026,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:37.239Z"
+    },
+    {
+      "id": "1ea1cf53-21ac-4acc-9d73-f3411845236c",
+      "tmdb_id": 1397201,
+      "title": "Golden Kamui : La prison d'Abashiri",
+      "year": 2026,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:17.185Z"
+    },
+    {
+      "id": "3bb77950-eb69-4d28-a098-78e6bc957a5e",
+      "tmdb_id": 1633263,
+      "title": "Wonderful Nightmare",
+      "year": 2026,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:51.100Z"
+    },
+    {
+      "id": "c113319a-d4bf-4ce8-8573-dfed9a2d8173",
+      "tmdb_id": 1628116,
+      "title": "BTS : Le Retour",
+      "year": 2026,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:17.565Z"
+    },
+    {
+      "id": "ac4e1de0-7569-414b-a711-c7abc1e634c5",
+      "tmdb_id": 454639,
+      "title": "Les Maîtres de l'univers",
+      "year": 2026,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:21.581Z"
+    },
+    {
+      "id": "b1de7803-d507-4e61-84b7-81e7fce187f1",
+      "tmdb_id": 1440098,
+      "title": "Attirés Malgré Nous",
+      "year": 2026,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:21.739Z"
+    },
+    {
+      "id": "53a1a584-008a-44cd-874d-dced7a3b4b52",
+      "tmdb_id": 1159831,
+      "title": "The Bride !",
+      "year": 2026,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:21.882Z"
+    },
+    {
+      "id": "9457f296-3993-4096-9671-e27097ac6b4f",
+      "tmdb_id": 1396749,
+      "title": "Wild Sing",
+      "year": 2026,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:31.849Z"
+    },
+    {
+      "id": "47d8b46e-a4c3-418b-9cbd-95ac28946afe",
+      "tmdb_id": 1451344,
+      "title": "Mes hommes d'action",
+      "year": 2026,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:26.423Z"
+    },
+    {
+      "id": "f5b53c1a-80b5-4dbd-a196-f7dab71b0175",
+      "tmdb_id": 1314481,
+      "title": "Le Diable s'habille en Prada 2",
+      "year": 2026,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:27.017Z"
+    },
+    {
+      "id": "77702a6b-b490-4939-bc42-47892f203e89",
+      "tmdb_id": 1340206,
+      "title": "Le Virtuose",
+      "year": 2026,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:41.791Z"
+    },
+    {
+      "id": "af792538-e824-4f19-8837-604910e60487",
+      "tmdb_id": 1433367,
+      "title": "Juste pour une Nuit",
+      "year": 2026,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:31.710Z"
+    },
+    {
+      "id": "637cc0fd-9e5c-4f0e-8f12-5205a7d75768",
+      "tmdb_id": 1081003,
+      "title": "Supergirl",
+      "year": 2026,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:31.852Z"
+    },
+    {
+      "id": "eae3b503-3a21-4624-9c75-26fc36e5683b",
+      "tmdb_id": 1284041,
+      "title": "Le Dernier Refuge",
+      "year": 2026,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:32.082Z"
+    },
+    {
+      "id": "2c408b21-5018-4837-900d-a45efe2a1ff9",
+      "tmdb_id": 1616674,
+      "title": "Me Before Me",
+      "year": 2026,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:37.479Z"
+    },
+    {
+      "id": "f52f582e-deda-4eab-a67c-63857028b0de",
+      "tmdb_id": 1656220,
+      "title": "23 000 vies",
+      "year": 2026,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:45.904Z"
+    },
+    {
+      "id": "98c8d501-49e6-429c-8534-73c5cc057381",
+      "tmdb_id": 1468683,
+      "title": "Heartstopper Forever",
+      "year": 2026,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:45.918Z"
+    },
+    {
+      "id": "b9cd9f6c-0f25-4bb1-b810-de7538b2b8d5",
+      "tmdb_id": 1504358,
+      "title": "Don't Say Good Luck",
+      "year": 2026,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:46.129Z"
+    },
+    {
+      "id": "a44b71b7-d9e1-4e19-b543-fe45fc811150",
+      "tmdb_id": 1198994,
+      "title": "Send Help",
+      "year": 2026,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:50.544Z"
+    },
+    {
+      "id": "2f834b84-0df8-4fb6-bea6-3c56430262ef",
+      "tmdb_id": 931285,
+      "title": "Mortal Kombat II",
+      "year": 2026,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:50.560Z"
+    },
+    {
+      "id": "999b754f-26ee-43ed-a906-4fb174923e9e",
+      "tmdb_id": 1635276,
+      "title": "Mange, prie, aboie",
+      "year": 2026,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:51.010Z"
+    },
+    {
+      "id": "3145483e-f9c5-4166-81e4-9104f7907af7",
+      "tmdb_id": 1386315,
+      "title": "The Runner",
+      "year": 2026,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:51.210Z"
+    },
+    {
+      "id": "bc3ef412-7341-44b9-adee-db3389b9eee8",
+      "tmdb_id": 1304313,
+      "title": "Le Réveil de la Momie",
+      "year": 2026,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:51.552Z"
     },
     {
       "id": "160f422c-1c7b-4583-af46-926c70580b45",
@@ -169,7 +493,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:13:29.173Z"
+      "last_verified": "2026-09-14T14:18:06.715Z"
     },
     {
       "id": "dd2d99a9-0045-4f51-9e50-c31eab67da67",
@@ -205,7 +529,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:13:29.413Z"
+      "last_verified": "2026-09-14T14:18:31.826Z"
     },
     {
       "id": "de994105-805b-4a14-8d31-c6c98f952d8d",
@@ -241,7 +565,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T11:11:33.062Z"
+      "last_verified": "2026-09-14T14:18:27.176Z"
     },
     {
       "id": "dfe9c86f-5cc9-4a50-ba5a-bfae0f4d3a43",
@@ -253,7 +577,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:13:30.213Z"
+      "last_verified": "2026-09-14T14:18:07.228Z"
     },
     {
       "id": "df1368f4-7176-43f9-98bd-a0aab1a396b2",
@@ -277,7 +601,415 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:13:28.245Z"
+      "last_verified": "2026-09-14T14:18:06.376Z"
+    },
+    {
+      "id": "daddac2d-f72b-4a61-aafb-78abb9555dc4",
+      "tmdb_id": 1124620,
+      "title": "The Monkey",
+      "year": 2025,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:27.190Z"
+    },
+    {
+      "id": "05ba5fa5-de0c-494e-912d-0205674e1c46",
+      "tmdb_id": 1228246,
+      "title": "Five Nights at Freddy's 2",
+      "year": 2025,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:46.301Z"
+    },
+    {
+      "id": "ded85d7c-70a8-4291-8d25-89a263f7854e",
+      "tmdb_id": 1248226,
+      "title": "Une journée incontrôlable",
+      "year": 2025,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:11.722Z"
+    },
+    {
+      "id": "e1a7e371-eb79-467a-bb7c-63a00a953fb0",
+      "tmdb_id": 1230368,
+      "title": "Springsteen : Deliver Me from Nowhere",
+      "year": 2025,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:21.506Z"
+    },
+    {
+      "id": "895365fb-2ae9-497b-b182-63124537ba10",
+      "tmdb_id": 1233575,
+      "title": "The Insider",
+      "year": 2025,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:37.042Z"
+    },
+    {
+      "id": "cad16faf-f031-4bca-8eb4-1c96a97b8d04",
+      "tmdb_id": 1100800,
+      "title": "L'Aéronaute",
+      "year": 2025,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:17.420Z"
+    },
+    {
+      "id": "0b1d8b58-95f9-4241-ae7d-182ca481f887",
+      "tmdb_id": 1232546,
+      "title": "Until Dawn : La mort sans fin",
+      "year": 2025,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:21.971Z"
+    },
+    {
+      "id": "059f6381-5187-4baf-a864-992829e2d54d",
+      "tmdb_id": 1061474,
+      "title": "Superman",
+      "year": 2025,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:31.364Z"
+    },
+    {
+      "id": "fdb29dcc-1819-41ab-8462-3e4bc78cb90d",
+      "tmdb_id": 1098006,
+      "title": "Fountain of Youth",
+      "year": 2025,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:41.942Z"
+    },
+    {
+      "id": "6af92b78-c0a9-4832-93ea-d6e615de6cf3",
+      "tmdb_id": 1371185,
+      "title": "Sur un air de blues",
+      "year": 2025,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:22.359Z"
+    },
+    {
+      "id": "c4d77468-b8db-4b2b-9c56-be04d09153b1",
+      "tmdb_id": 648878,
+      "title": "Eddington",
+      "year": 2025,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:22.368Z"
+    },
+    {
+      "id": "2d0bf706-16b2-41a1-9626-2f9780c5b457",
+      "tmdb_id": 1242011,
+      "title": "Together",
+      "year": 2025,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:22.468Z"
+    },
+    {
+      "id": "1954dedf-c322-447e-9598-116ab49102f9",
+      "tmdb_id": 1242898,
+      "title": "Predator: Badlands",
+      "year": 2025,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:37.009Z"
+    },
+    {
+      "id": "c1bb56ae-5aef-42c2-a098-6ed23d87b6bb",
+      "tmdb_id": 1246310,
+      "title": "Madea : Mariage exotique",
+      "year": 2025,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:26.643Z"
+    },
+    {
+      "id": "1cbb576f-ec17-4f39-bc4b-18cb7c311259",
+      "tmdb_id": 957119,
+      "title": "Closer",
+      "year": 2025,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:26.790Z"
+    },
+    {
+      "id": "9b8a1d21-66fd-4bdd-bee0-4a34293d5766",
+      "tmdb_id": 710295,
+      "title": "Wolf Man",
+      "year": 2025,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:26.902Z"
+    },
+    {
+      "id": "a4896f6f-4089-4afa-b5e3-0e07eff544ea",
+      "tmdb_id": 891584,
+      "title": "Le Son des souvenirs",
+      "year": 2025,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:27.026Z"
+    },
+    {
+      "id": "f30d6ed0-850e-45ae-b8f9-2064703b1553",
+      "tmdb_id": 1397364,
+      "title": "La grazia",
+      "year": 2025,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:27.368Z"
+    },
+    {
+      "id": "8f914be4-b9b0-4852-9bab-e4f8e39f9922",
+      "tmdb_id": 575265,
+      "title": "Mission : Impossible - The Final Reckoning",
+      "year": 2025,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:32.297Z"
+    },
+    {
+      "id": "523c938d-c7be-4c09-85d0-3f6a8502f8c7",
+      "tmdb_id": 1327862,
+      "title": "Regretting You",
+      "year": 2025,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:36.621Z"
+    },
+    {
+      "id": "db1f0535-51f3-4aaf-a3fd-4babc58c3924",
+      "tmdb_id": 911430,
+      "title": "F1® Le Film",
+      "year": 2025,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:36.874Z"
+    },
+    {
+      "id": "47c77c24-6c7c-4486-be8f-070a116eea46",
+      "tmdb_id": 1234731,
+      "title": "Anaconda",
+      "year": 2025,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:36.938Z"
+    },
+    {
+      "id": "5938bd3b-d162-4e4a-81f2-565866a0c3d8",
+      "tmdb_id": 1319965,
+      "title": "All of You",
+      "year": 2025,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:41.270Z"
+    },
+    {
+      "id": "2094f0a7-310f-4363-a769-9ba85b4c596f",
+      "tmdb_id": 1368166,
+      "title": "La Femme de ménage",
+      "year": 2025,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:41.491Z"
+    },
+    {
+      "id": "1b03f0b3-351d-4775-9584-888aade3c835",
+      "tmdb_id": 1011477,
+      "title": "Karate Kid : Legends",
+      "year": 2025,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:41.519Z"
+    },
+    {
+      "id": "97a343d9-2e7a-42e1-a5ba-378799fa5e1b",
+      "tmdb_id": 1246049,
+      "title": "Dracula",
+      "year": 2025,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:41.718Z"
+    },
+    {
+      "id": "2703905f-88c5-4e18-8249-d10b2a29467b",
+      "tmdb_id": 604079,
+      "title": "Marche ou crève",
+      "year": 2025,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:42.060Z"
+    },
+    {
+      "id": "713d46c4-c8c1-4a80-8917-b64225a46d68",
+      "tmdb_id": 1242434,
+      "title": "Highest 2 Lowest",
+      "year": 2025,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:42.132Z"
+    },
+    {
+      "id": "7dca07a9-2879-4aec-8fe9-6c811916a81c",
+      "tmdb_id": 1124566,
+      "title": "Valeur sentimentale",
+      "year": 2025,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:51.310Z"
+    },
+    {
+      "id": "14eb1cc8-4a1f-4d4f-8974-5e1d512c12f4",
+      "tmdb_id": 1150370,
+      "title": "Cold Wallet",
+      "year": 2025,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:46.565Z"
+    },
+    {
+      "id": "c6d95268-0632-4460-9180-d961638af334",
+      "tmdb_id": 1426040,
+      "title": "Le bachelor meurtrier",
+      "year": 2025,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:46.636Z"
+    },
+    {
+      "id": "60a765ef-6786-4905-b89c-add02593cd6c",
+      "tmdb_id": 1115468,
+      "title": "Les Enfants de Dieu",
+      "year": 2025,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:46.767Z"
+    },
+    {
+      "id": "17ab6fba-8697-4af8-9a69-53af2aff4d63",
+      "tmdb_id": 1312157,
+      "title": "Follement(e)",
+      "year": 2025,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:50.975Z"
+    },
+    {
+      "id": "ffdeaaec-ebef-4865-87b8-b416943de7fa",
+      "tmdb_id": 1317288,
+      "title": "Marty Supreme",
+      "year": 2025,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:51.229Z"
     },
     {
       "id": "7067ca09-45d3-4864-b5b2-4a373eb5efae",
@@ -301,7 +1033,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:13:29.753Z"
+      "last_verified": "2026-09-14T14:18:06.956Z"
     },
     {
       "id": "0d6d3ef6-1a19-47c4-be1e-91934087ac4f",
@@ -316,6 +1048,330 @@
       "last_verified": "2026-09-14T11:11:16.937Z"
     },
     {
+      "id": "0eac76a3-8f42-4044-b942-60a820c4da47",
+      "tmdb_id": 1062215,
+      "title": "L'I.A. du mal",
+      "year": 2024,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:21.889Z"
+    },
+    {
+      "id": "6e75cbd0-e62d-470f-80ae-5ec90cf473a7",
+      "tmdb_id": 1032823,
+      "title": "Trap",
+      "year": 2024,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:11.488Z"
+    },
+    {
+      "id": "3bf1f974-b7b0-4135-8c42-932e5b0317c4",
+      "tmdb_id": 1029955,
+      "title": "Kinds of Kindness",
+      "year": 2024,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:37.254Z"
+    },
+    {
+      "id": "d5246d70-6851-45ec-a773-372c8f4cca9a",
+      "tmdb_id": 1109255,
+      "title": "Parthenope",
+      "year": 2024,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:22.273Z"
+    },
+    {
+      "id": "99c6dd8d-770d-47b1-acec-32d2afae3f13",
+      "tmdb_id": 1226578,
+      "title": "Longlegs",
+      "year": 2024,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:16.956Z"
+    },
+    {
+      "id": "63109937-1af3-4098-9ca1-15885bbfc458",
+      "tmdb_id": 1167271,
+      "title": "Week-end à Taipei",
+      "year": 2024,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:41.641Z"
+    },
+    {
+      "id": "9ed078a2-b992-457f-b02d-818910f5b875",
+      "tmdb_id": 1111873,
+      "title": "Abigail",
+      "year": 2024,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:17.178Z"
+    },
+    {
+      "id": "3313dda9-df08-4c81-9066-283e24e26ecf",
+      "tmdb_id": 746036,
+      "title": "The Fall Guy",
+      "year": 2024,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:21.739Z"
+    },
+    {
+      "id": "0852cd93-23b9-4d69-9c52-5d751b4f7e3e",
+      "tmdb_id": 1148663,
+      "title": "Lettres siciliennes",
+      "year": 2024,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:22.137Z"
+    },
+    {
+      "id": "c70f9c02-7a76-436d-b0ea-09b3ad7e1a92",
+      "tmdb_id": 917496,
+      "title": "Beetlejuice Beetlejuice",
+      "year": 2024,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:46.102Z"
+    },
+    {
+      "id": "46bd78e6-fe86-49df-b84b-058603c1f7d6",
+      "tmdb_id": 971606,
+      "title": "Le Silence de Mélodie",
+      "year": 2024,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:22.594Z"
+    },
+    {
+      "id": "f66b996f-6835-4270-8dd3-892704c59da7",
+      "tmdb_id": 953713,
+      "title": "Parachute",
+      "year": 2024,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:31.594Z"
+    },
+    {
+      "id": "94fd8ab6-ec67-4012-ba58-328ea0a27d4c",
+      "tmdb_id": 956842,
+      "title": "To the Moon",
+      "year": 2024,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:31.950Z"
+    },
+    {
+      "id": "2ccd34d7-43a4-4e90-806d-5bd6f8f6ae06",
+      "tmdb_id": 877817,
+      "title": "Wolfs",
+      "year": 2024,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:36.374Z"
+    },
+    {
+      "id": "431ade2c-f365-4626-b7de-630bf032a516",
+      "tmdb_id": 639720,
+      "title": "Blue & Compagnie",
+      "year": 2024,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:36.396Z"
+    },
+    {
+      "id": "99841164-7f24-471d-b34e-3c8d628417bc",
+      "tmdb_id": 1042657,
+      "title": "Latency",
+      "year": 2024,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:36.634Z"
+    },
+    {
+      "id": "2107e3aa-cd25-4090-8a76-6ea3963e3391",
+      "tmdb_id": 848439,
+      "title": "Le Jeu de la reine",
+      "year": 2024,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:36.850Z"
+    },
+    {
+      "id": "1de2f3b6-2b8d-4aa4-aa87-1e2c158a8dbd",
+      "tmdb_id": 533535,
+      "title": "Deadpool & Wolverine",
+      "year": 2024,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:37.104Z"
+    },
+    {
+      "id": "7b9ddd45-cc1d-4dd4-a4c2-952d5732de98",
+      "tmdb_id": 1165466,
+      "title": "Wake Up",
+      "year": 2024,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:37.317Z"
+    },
+    {
+      "id": "ad05c15d-9cb9-45f0-a29e-ab9ba1e4bb38",
+      "tmdb_id": 889737,
+      "title": "Joker : Folie à deux",
+      "year": 2024,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:51.160Z"
+    },
+    {
+      "id": "66a3817f-2516-45e3-862c-61e29554c33c",
+      "tmdb_id": 848538,
+      "title": "Argylle",
+      "year": 2024,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:41.491Z"
+    },
+    {
+      "id": "2002c6dc-dd05-454b-8c0f-e831a307653c",
+      "tmdb_id": 718821,
+      "title": "Twisters",
+      "year": 2024,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:41.945Z"
+    },
+    {
+      "id": "cb641012-c67c-4954-9bdf-6043a3bebda7",
+      "tmdb_id": 719221,
+      "title": "Les Cartes du mal",
+      "year": 2024,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:42.085Z"
+    },
+    {
+      "id": "3d409165-38a6-4ab4-8214-25fce62675df",
+      "tmdb_id": 1257130,
+      "title": "Zéro pression",
+      "year": 2024,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:45.902Z"
+    },
+    {
+      "id": "0cc4412a-d16c-4527-94bd-108fcc822985",
+      "tmdb_id": 653346,
+      "title": "La Planète des singes : Le Nouveau Royaume",
+      "year": 2024,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:46.534Z"
+    },
+    {
+      "id": "6fa1116d-0057-41ef-8bf4-d55f8c87e85f",
+      "tmdb_id": 280180,
+      "title": "Le Flic de Beverly Hills : Axel F.",
+      "year": 2024,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:46.876Z"
+    },
+    {
+      "id": "1ceac7db-477c-4b6b-9480-00a3e0e2ff24",
+      "tmdb_id": 939243,
+      "title": "Sonic 3, le film",
+      "year": 2024,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:50.536Z"
+    },
+    {
       "id": "b524189d-ffbf-4c9b-a253-712d6c3a649a",
       "tmdb_id": 346698,
       "title": "Barbie",
@@ -325,7 +1381,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T11:11:25.698Z"
+      "last_verified": "2026-09-14T14:18:26.688Z"
     },
     {
       "id": "ef67eaa3-547c-485b-a556-a9fe1bab0607",
@@ -337,7 +1393,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:13:28.243Z"
+      "last_verified": "2026-09-14T14:18:06.387Z"
     },
     {
       "id": "742437a8-b092-4ee5-b2a4-790f6dc61ea2",
@@ -349,7 +1405,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T11:11:29.291Z"
+      "last_verified": "2026-09-14T14:18:17.696Z"
     },
     {
       "id": "8dae1bd1-1509-4ea6-a005-f4e37ab01ac5",
@@ -361,7 +1417,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:13:28.476Z"
+      "last_verified": "2026-09-14T14:18:06.569Z"
     },
     {
       "id": "299858d8-b022-4514-9351-ac6b82bbcdc1",
@@ -373,7 +1429,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T11:11:21.717Z"
+      "last_verified": "2026-09-14T14:18:41.166Z"
     },
     {
       "id": "91d7eac4-299d-4ad8-a1e7-5408357957b4",
@@ -385,7 +1441,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:13:29.527Z"
+      "last_verified": "2026-09-14T14:18:06.901Z"
     },
     {
       "id": "a6ba44d5-e923-45b0-9046-387e97296d0e",
@@ -397,7 +1453,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T11:11:29.221Z"
+      "last_verified": "2026-09-14T14:18:46.518Z"
     },
     {
       "id": "4bcd2ad1-afb2-4b86-92d7-1e3d9eb5d671",
@@ -409,7 +1465,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T11:11:29.085Z"
+      "last_verified": "2026-09-14T14:18:50.779Z"
     },
     {
       "id": "a0d0f86d-39c8-496c-b9de-264056cd047c",
@@ -433,7 +1489,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:13:28.478Z"
+      "last_verified": "2026-09-14T14:18:06.550Z"
     },
     {
       "id": "afe1f989-48b9-4470-8838-7535ccdaa4ac",
@@ -445,7 +1501,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:13:29.989Z"
+      "last_verified": "2026-09-14T14:18:16.860Z"
     },
     {
       "id": "0197dc15-09cf-4795-ac03-f2b29316c1e3",
@@ -457,7 +1513,247 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:13:29.293Z"
+      "last_verified": "2026-09-14T14:18:41.669Z"
+    },
+    {
+      "id": "5aa03485-f8d5-404e-949b-68f202b8d9a1",
+      "tmdb_id": 493529,
+      "title": "Donjons & Dragons : l'Honneur des voleurs",
+      "year": 2023,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:11.008Z"
+    },
+    {
+      "id": "1b7f8d1c-5d3e-4b62-941b-4c82e4cf3b03",
+      "tmdb_id": 695721,
+      "title": "Hunger Games : La Ballade du serpent et de l'oiseau chanteur",
+      "year": 2023,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:11.493Z"
+    },
+    {
+      "id": "2bbb9a51-c45c-4e02-a148-112a7da71140",
+      "tmdb_id": 980489,
+      "title": "Gran Turismo",
+      "year": 2023,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:36.298Z"
+    },
+    {
+      "id": "4dac5d49-2b0b-4d6d-9a03-5fc5afa64f42",
+      "tmdb_id": 1490268,
+      "title": "Strangers",
+      "year": 2023,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:16.714Z"
+    },
+    {
+      "id": "e2ba0a06-8b62-46ee-bd78-20b128ec9def",
+      "tmdb_id": 565770,
+      "title": "Blue Beetle",
+      "year": 2023,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:16.723Z"
+    },
+    {
+      "id": "46c989a8-a453-470f-a5c9-b7976765944d",
+      "tmdb_id": 726759,
+      "title": "Tetris",
+      "year": 2023,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:41.820Z"
+    },
+    {
+      "id": "d9daa66a-66e2-4504-ab59-a8af5b6919de",
+      "tmdb_id": 970348,
+      "title": "The Old Oak",
+      "year": 2023,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:22.205Z"
+    },
+    {
+      "id": "d91e4a00-ffbd-44d5-ba3a-3d29beb2c6a8",
+      "tmdb_id": 943818,
+      "title": "Back on the Strip",
+      "year": 2023,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:26.413Z"
+    },
+    {
+      "id": "973ec900-1783-47b4-aefb-30fc3627e243",
+      "tmdb_id": 945729,
+      "title": "Mystère à Venise",
+      "year": 2023,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:27.429Z"
+    },
+    {
+      "id": "8d1b2a60-4030-43a9-af95-78822ff2d302",
+      "tmdb_id": 631842,
+      "title": "Knock at the Cabin",
+      "year": 2023,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:31.456Z"
+    },
+    {
+      "id": "10ffffea-cb70-496e-84ca-2675090b4ab9",
+      "tmdb_id": 605886,
+      "title": "Misanthrope",
+      "year": 2023,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:32.065Z"
+    },
+    {
+      "id": "011fd36a-c923-4470-a00f-295f3dbc6219",
+      "tmdb_id": 1181545,
+      "title": "Un bébé chez les Kandasamys",
+      "year": 2023,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:32.109Z"
+    },
+    {
+      "id": "077b043a-29ab-496f-8386-b94daaacfb79",
+      "tmdb_id": 855263,
+      "title": "Mille et un",
+      "year": 2023,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:36.421Z"
+    },
+    {
+      "id": "2069c911-332e-454e-9a45-b3647207784c",
+      "tmdb_id": 804150,
+      "title": "Crazy Bear",
+      "year": 2023,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:37.486Z"
+    },
+    {
+      "id": "2d4a0b1f-5f5f-4f3a-b278-6791c15148c0",
+      "tmdb_id": 978870,
+      "title": "Dernière Nuit à Milan",
+      "year": 2023,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:41.629Z"
+    },
+    {
+      "id": "07d18fb1-f333-4705-b451-3fa8897639f0",
+      "tmdb_id": 768362,
+      "title": "Missing : Disparition inquiétante",
+      "year": 2023,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:46.153Z"
+    },
+    {
+      "id": "d15da4ab-5728-42eb-9888-d3bf9542865e",
+      "tmdb_id": 926008,
+      "title": "The Beanie Bubble",
+      "year": 2023,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:46.398Z"
+    },
+    {
+      "id": "ac97196b-ad07-4d3b-a5d9-8a279e219dba",
+      "tmdb_id": 736769,
+      "title": "Ils ont cloné Tyrone",
+      "year": 2023,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:50.996Z"
+    },
+    {
+      "id": "fdf4f8c4-8ef0-4a02-a2e0-386634751668",
+      "tmdb_id": 1146302,
+      "title": "Sly : Stallone par Stallone",
+      "year": 2023,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:51.175Z"
+    },
+    {
+      "id": "a81b30d7-2fcc-4905-b080-a0c17fe40279",
+      "tmdb_id": 1232096,
+      "title": "La Pat' Patrouille : L'Aqua Patrouille",
+      "year": 2023,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:51.594Z"
     },
     {
       "id": "ec90db13-0274-42da-a18e-df7ff3028520",
@@ -481,7 +1777,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T11:11:23.228Z"
+      "last_verified": "2026-09-14T14:18:11.015Z"
     },
     {
       "id": "4a997c22-a4c9-4b24-bce9-cb5d567e61c9",
@@ -493,7 +1789,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:13:28.483Z"
+      "last_verified": "2026-09-14T14:18:31.592Z"
     },
     {
       "id": "b36fda08-a8d9-47bb-a4a9-e067a2d46913",
@@ -505,7 +1801,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:13:30.262Z"
+      "last_verified": "2026-09-14T14:18:50.710Z"
     },
     {
       "id": "2b550b20-241e-4c5a-93a3-dea5a4761d4e",
@@ -517,7 +1813,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:13:28.479Z"
+      "last_verified": "2026-09-14T14:18:26.837Z"
     },
     {
       "id": "ac566c7f-9579-4a84-bae4-a62913f4e397",
@@ -529,7 +1825,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:13:29.750Z"
+      "last_verified": "2026-09-14T14:18:31.976Z"
     },
     {
       "id": "30a0472a-4891-48a7-8e87-769b684cf8a4",
@@ -541,7 +1837,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:13:28.491Z"
+      "last_verified": "2026-09-14T14:18:50.929Z"
     },
     {
       "id": "048d5fa9-4685-4791-a6e8-f341d0a5e5a3",
@@ -565,7 +1861,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T11:11:24.499Z"
+      "last_verified": "2026-09-14T14:18:50.543Z"
     },
     {
       "id": "ba9e3bea-07c7-4b11-bcc8-1dbd2da8b671",
@@ -592,6 +1888,306 @@
       "last_verified": "2026-09-14T11:11:32.721Z"
     },
     {
+      "id": "8bce8b8c-178d-4a1a-a568-10cdb4de0aac",
+      "tmdb_id": 593643,
+      "title": "Le Menu",
+      "year": 2022,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:11.736Z"
+    },
+    {
+      "id": "b1e9d525-bef8-4ec8-a57b-d2f9b18b74e1",
+      "tmdb_id": 76600,
+      "title": "Avatar : La Voie de l'eau",
+      "year": 2022,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:36.449Z"
+    },
+    {
+      "id": "0e04a35c-6f48-46b6-94a0-9be371a1da01",
+      "tmdb_id": 882598,
+      "title": "Smile",
+      "year": 2022,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:12.007Z"
+    },
+    {
+      "id": "7fe8625d-716a-4ed5-bf35-0aa77e3e26ca",
+      "tmdb_id": 736732,
+      "title": "Les Bonnes étoiles",
+      "year": 2022,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:17.192Z"
+    },
+    {
+      "id": "b6afbb13-5b09-4efb-9692-d01dae9e35c5",
+      "tmdb_id": 335787,
+      "title": "Uncharted",
+      "year": 2022,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:21.745Z"
+    },
+    {
+      "id": "133146c4-9848-426a-9450-7ada08f1b9f8",
+      "tmdb_id": 642885,
+      "title": "Hocus Pocus 2",
+      "year": 2022,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:17.725Z"
+    },
+    {
+      "id": "93f1290a-5f7e-46af-be72-5975ed4a1a20",
+      "tmdb_id": 673271,
+      "title": "13 : La comédie musicale",
+      "year": 2022,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:26.414Z"
+    },
+    {
+      "id": "25b19c40-1ee2-43fd-88f0-0cd9f13ceeee",
+      "tmdb_id": 414906,
+      "title": "The Batman",
+      "year": 2022,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:26.561Z"
+    },
+    {
+      "id": "2577342d-ab69-403e-8bd2-52fff9329933",
+      "tmdb_id": 889699,
+      "title": "Les Nuits de Mashhad",
+      "year": 2022,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:41.420Z"
+    },
+    {
+      "id": "d5ed2890-5475-4408-9f96-9591a30a4fd7",
+      "tmdb_id": 839828,
+      "title": "Jagat Arwah",
+      "year": 2022,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:27.098Z"
+    },
+    {
+      "id": "b202a088-39de-4cf6-856f-3f5a94b3257a",
+      "tmdb_id": 758330,
+      "title": "Mes rendez-vous avec Leo",
+      "year": 2022,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:31.442Z"
+    },
+    {
+      "id": "b69fc2ad-d2c5-453c-a0ff-0454b5ccbe38",
+      "tmdb_id": 338958,
+      "title": "Il était une fois 2",
+      "year": 2022,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:51.379Z"
+    },
+    {
+      "id": "563f9f1b-7892-4805-add7-e5f83aaef809",
+      "tmdb_id": 664469,
+      "title": "Amsterdam",
+      "year": 2022,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:31.824Z"
+    },
+    {
+      "id": "17cc9ccc-b734-4f5e-a029-7ddca169089f",
+      "tmdb_id": 979296,
+      "title": "Sonic Drone Maison",
+      "year": 2022,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:36.708Z"
+    },
+    {
+      "id": "a9e79549-d6f6-4b0b-b946-f068a843d685",
+      "tmdb_id": 526896,
+      "title": "Morbius",
+      "year": 2022,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:36.859Z"
+    },
+    {
+      "id": "015179d6-fbd7-4f75-93b5-36f1f037628d",
+      "tmdb_id": 899112,
+      "title": "Violent Night",
+      "year": 2022,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:37.085Z"
+    },
+    {
+      "id": "0bf1d9bb-fde9-4b63-a29e-a98ab90dac2e",
+      "tmdb_id": 962571,
+      "title": "Joyland",
+      "year": 2022,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:37.272Z"
+    },
+    {
+      "id": "f6f9e2f2-60aa-4594-98a9-c552c7f15893",
+      "tmdb_id": 883502,
+      "title": "Fortress : Sniper's Eye",
+      "year": 2022,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:41.277Z"
+    },
+    {
+      "id": "8bdb7c52-7e35-4ac6-8196-3af9c6fae20f",
+      "tmdb_id": 766507,
+      "title": "Prey",
+      "year": 2022,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:41.657Z"
+    },
+    {
+      "id": "8f780479-7549-48af-acdc-2fe4de1bf925",
+      "tmdb_id": 436270,
+      "title": "Black Adam",
+      "year": 2022,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:45.952Z"
+    },
+    {
+      "id": "4c6d8f11-4531-4a6f-9b77-9e1bc410e840",
+      "tmdb_id": 632856,
+      "title": "Spirited",
+      "year": 2022,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:46.457Z"
+    },
+    {
+      "id": "878875b6-ee0a-4975-aa9c-6f0bc40d30fc",
+      "tmdb_id": 830788,
+      "title": "Le Bal de l'Enfer",
+      "year": 2022,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:46.748Z"
+    },
+    {
+      "id": "8f87a2a9-6902-4624-bd57-58d50505bc88",
+      "tmdb_id": 615777,
+      "title": "Babylon",
+      "year": 2022,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:50.768Z"
+    },
+    {
+      "id": "e58adf92-eda1-4756-a13e-a2fccbbb2ed9",
+      "tmdb_id": 406759,
+      "title": "Moonfall",
+      "year": 2022,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:50.950Z"
+    },
+    {
+      "id": "7ca8fab7-a5c6-4a39-ac19-67f630e41c5c",
+      "tmdb_id": 800939,
+      "title": "Ticket to paradise",
+      "year": 2022,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:51.450Z"
+    },
+    {
       "id": "12265ab1-5073-487e-8aee-de4d76bcc360",
       "tmdb_id": 673309,
       "title": "American Underdog",
@@ -601,7 +2197,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:13:30.225Z"
+      "last_verified": "2026-09-14T14:18:07.234Z"
     },
     {
       "id": "6237364d-63f7-4d42-9552-85d3161a61bb",
@@ -613,7 +2209,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:13:28.246Z"
+      "last_verified": "2026-09-14T14:18:06.373Z"
     },
     {
       "id": "9e81cae6-6ea0-41a1-97e6-aa945d324ec0",
@@ -625,7 +2221,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T11:11:26.507Z"
+      "last_verified": "2026-09-14T14:18:17.487Z"
     },
     {
       "id": "db055a1d-b1f3-42a1-99a5-0eaef72b5948",
@@ -673,7 +2269,7 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:13:30.252Z"
+      "last_verified": "2026-09-14T14:18:46.068Z"
     },
     {
       "id": "28de1a4f-6790-46f8-b6a7-d0d401bef7bf",
@@ -685,7 +2281,307 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:13:29.977Z"
+      "last_verified": "2026-09-14T14:18:07.066Z"
+    },
+    {
+      "id": "3a490ff7-8b2d-490b-ad6f-4816c2e52f02",
+      "tmdb_id": 597208,
+      "title": "Nightmare Alley",
+      "year": 2021,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:26.573Z"
+    },
+    {
+      "id": "e8e074de-23f2-41f4-b26e-753b17978b77",
+      "tmdb_id": 566525,
+      "title": "Shang-Chi et la Légende des Dix Anneaux",
+      "year": 2021,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:16.710Z"
+    },
+    {
+      "id": "e87f3a0e-047d-45c6-be66-c17c94051242",
+      "tmdb_id": 645861,
+      "title": "South of Heaven",
+      "year": 2021,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:16.959Z"
+    },
+    {
+      "id": "da21a9ba-ee5e-464f-8843-a7841c00dd33",
+      "tmdb_id": 649394,
+      "title": "À quel prix ?",
+      "year": 2021,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:17.222Z"
+    },
+    {
+      "id": "fcfe641c-01fb-4ef6-82cf-1970cd44958d",
+      "tmdb_id": 602269,
+      "title": "Une affaire de détails",
+      "year": 2021,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:21.831Z"
+    },
+    {
+      "id": "d56756aa-c35f-4489-a1bc-cb7023866119",
+      "tmdb_id": 614917,
+      "title": "La Méthode Williams",
+      "year": 2021,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:26.448Z"
+    },
+    {
+      "id": "956b83da-9c42-452d-8a23-a80a14b59925",
+      "tmdb_id": 763788,
+      "title": "Dangerous",
+      "year": 2021,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:26.806Z"
+    },
+    {
+      "id": "b7c05000-a68d-4fdc-8e3d-e6811fe1f299",
+      "tmdb_id": 617653,
+      "title": "Le Dernier Duel",
+      "year": 2021,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:27.259Z"
+    },
+    {
+      "id": "8efbb85d-cf41-4ec9-b5b6-1707aea1d50d",
+      "tmdb_id": 588182,
+      "title": "Compartiment n°6",
+      "year": 2021,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:27.420Z"
+    },
+    {
+      "id": "d3f67980-e6ce-4fc1-bdd5-df555fea4250",
+      "tmdb_id": 780382,
+      "title": "Le Loup et le Lion",
+      "year": 2021,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:46.219Z"
+    },
+    {
+      "id": "564f590e-c3da-4da2-8f4f-d7e31d167fbf",
+      "tmdb_id": 544401,
+      "title": "Cherry",
+      "year": 2021,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:31.699Z"
+    },
+    {
+      "id": "b92de42e-3818-4bfb-bfde-f672e186ea46",
+      "tmdb_id": 522931,
+      "title": "Hitman & Bodyguard 2",
+      "year": 2021,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:32.200Z"
+    },
+    {
+      "id": "4597ff83-0f75-4cd5-ae6c-0d437c500d74",
+      "tmdb_id": 585245,
+      "title": "Clifford",
+      "year": 2021,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:36.661Z"
+    },
+    {
+      "id": "7d17ed85-e41e-410b-8135-cabe9aa88d9a",
+      "tmdb_id": 656530,
+      "title": "Je m'appelle Bagdad",
+      "year": 2021,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:37.252Z"
+    },
+    {
+      "id": "f0fedad7-6833-4dd0-a46e-8e74bb374d26",
+      "tmdb_id": 737737,
+      "title": "Babysitter Must Die",
+      "year": 2021,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:41.260Z"
+    },
+    {
+      "id": "d4e94d5b-4cd2-4a85-80da-a635fae69e3e",
+      "tmdb_id": 542178,
+      "title": "The French Dispatch",
+      "year": 2021,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:50.456Z"
+    },
+    {
+      "id": "227c73f4-a1c7-44d6-9953-990408f0c292",
+      "tmdb_id": 451048,
+      "title": "Jungle Cruise",
+      "year": 2021,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:46.279Z"
+    },
+    {
+      "id": "e653f614-8b34-4967-99cc-6ad49a06f7e8",
+      "tmdb_id": 713711,
+      "title": "The Gateway",
+      "year": 2021,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:41.904Z"
+    },
+    {
+      "id": "6f7521e1-ef18-411d-8d7c-5d11a85f6efa",
+      "tmdb_id": 763532,
+      "title": "Avance (trop) rapide",
+      "year": 2021,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:45.906Z"
+    },
+    {
+      "id": "5bfef10d-2778-477f-b42d-21ae15a4fddc",
+      "tmdb_id": 497698,
+      "title": "Black Widow",
+      "year": 2021,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:46.693Z"
+    },
+    {
+      "id": "394091a2-3288-474f-9a8f-f3282da13b1e",
+      "tmdb_id": 807196,
+      "title": "The Chef",
+      "year": 2021,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:50.709Z"
+    },
+    {
+      "id": "aae76cee-1364-4ead-ad84-b267af726cf4",
+      "tmdb_id": 580489,
+      "title": "Venom : Let There Be Carnage",
+      "year": 2021,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:51.339Z"
+    },
+    {
+      "id": "3824b0ae-bacd-4854-b203-18aca7d6ff6f",
+      "tmdb_id": 536728,
+      "title": "Le Rocker de Santa Barbara",
+      "year": 2021,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:51.540Z"
+    },
+    {
+      "id": "ab0c30ed-edff-4b8b-a60b-28b399ab1b38",
+      "tmdb_id": 400276,
+      "title": "Permis de tromper",
+      "year": 2016,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:11.243Z"
+    },
+    {
+      "id": "5ae8ec3f-226a-4fe8-9de1-0031047d89a8",
+      "tmdb_id": 304373,
+      "title": "Jusqu'au bout du monde",
+      "year": 2013,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:11.482Z"
     },
     {
       "id": "0075cf36-7d9b-4ea3-b7f6-0047f16838f3",
@@ -697,7 +2593,91 @@
       "source": "DoublageVF",
       "confidence": 1,
       "status": "confirmed",
-      "last_verified": "2026-09-14T14:13:30.028Z"
+      "last_verified": "2026-09-14T14:18:07.075Z"
+    },
+    {
+      "id": "d132f7f0-1a76-405c-98b4-d9eafe9372d1",
+      "tmdb_id": 77948,
+      "title": "Sans issue",
+      "year": 2012,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:50.767Z"
+    },
+    {
+      "id": "33bc76a7-a356-4a24-a0e2-3ee897c0bafe",
+      "tmdb_id": 700121,
+      "title": "La théorie du tout",
+      "year": 2009,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:11.974Z"
+    },
+    {
+      "id": "fedc6768-b80c-43fd-af2a-0bdc1fb392d3",
+      "tmdb_id": 22798,
+      "title": "Bliss",
+      "year": 2009,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:16.708Z"
+    },
+    {
+      "id": "cc27b0c6-8053-403d-86c1-b8349b18688b",
+      "tmdb_id": 35837,
+      "title": "Boogie",
+      "year": 2009,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:37.500Z"
+    },
+    {
+      "id": "7513c12b-c306-4cda-b74c-d571aa8cbf7a",
+      "tmdb_id": 38142,
+      "title": "5 centimètres par seconde",
+      "year": 2007,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:51.325Z"
+    },
+    {
+      "id": "e2e8aaba-20f3-465e-9404-1288f953228e",
+      "tmdb_id": 1494,
+      "title": "La cité interdite",
+      "year": 2006,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:36.892Z"
+    },
+    {
+      "id": "3e24e005-7e77-4e62-9cb6-d9bdb9e00ffb",
+      "tmdb_id": 11544,
+      "title": "Lilo & Stitch",
+      "year": 2002,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:36.403Z"
     },
     {
       "id": "39eb29dc-ccf1-4656-813e-505f2f79cef4",
@@ -710,6 +2690,66 @@
       "confidence": 1,
       "status": "confirmed",
       "last_verified": "2026-09-14T11:11:21.981Z"
+    },
+    {
+      "id": "b0ae1be7-7859-4caa-8cf6-c9cc6b9cd49a",
+      "tmdb_id": 244748,
+      "title": "Swan Song",
+      "year": 1992,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:26.793Z"
+    },
+    {
+      "id": "ad91e939-89a4-4c70-99d5-ef115d08d4a0",
+      "tmdb_id": 11087,
+      "title": "La Main sur le berceau",
+      "year": 1992,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:21.591Z"
+    },
+    {
+      "id": "0c171af8-a4f7-4e13-8545-0bc9a05fcd3d",
+      "tmdb_id": 29161,
+      "title": "Phenomena",
+      "year": 1985,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:11.018Z"
+    },
+    {
+      "id": "d740f887-100a-4af8-94da-4509ce710237",
+      "tmdb_id": 10895,
+      "title": "Pinocchio",
+      "year": 1940,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:37.389Z"
+    },
+    {
+      "id": "71aa9f3b-df41-471b-8732-e05cc9e7f9ec",
+      "tmdb_id": 1138003,
+      "title": "Les Semaines miracle",
+      "year": null,
+      "vf_confirmed": true,
+      "vf_country": "FR",
+      "source": "DoublageVF",
+      "confidence": 1,
+      "status": "confirmed",
+      "last_verified": "2026-09-14T14:18:36.613Z"
     }
   ]
 }
