@@ -1,5 +1,6 @@
 import express from "express";
 import { buildCatalog } from "./catalog.js";
+import { buildMeta } from "./meta.js";
 
 const app = express();
 const PORT = Number(process.env.PORT || 8080);
@@ -44,16 +45,26 @@ app.get("/catalog/:type/:id.json", async (req, res) => {
   }
 
   try {
-    const metas = await buildCatalog(req.params.id);
-    res.json({ metas });
+    res.json({ metas: await buildCatalog(req.params.id) });
   } catch (error) {
-    console.error(error);
+    console.error("Catalog error:", error);
     res.status(500).json({ metas: [], error: "Catalog unavailable" });
   }
 });
 
-app.get("/meta/:type/:id.json", (_req, res) => {
-  res.status(404).json({ error: "Meta not found" });
+app.get("/meta/:type/:id.json", async (req, res) => {
+  if (req.params.type !== "movie") {
+    return res.status(404).json({ error: "Meta not found" });
+  }
+
+  try {
+    const meta = await buildMeta(req.params.id);
+    if (!meta) return res.status(404).json({ error: "Meta not found" });
+    res.json({ meta });
+  } catch (error) {
+    console.error("Meta error:", error);
+    res.status(500).json({ error: "Meta unavailable" });
+  }
 });
 
 app.get("/", (_req, res) => {

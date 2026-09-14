@@ -35,9 +35,6 @@ function toMeta(movie, vfRecord) {
     releaseInfo: movie.release_date || "",
     imdbRating: movie.vote_average || undefined,
     posterShape: "poster",
-    behaviorHints: {
-      defaultVideoId: `tmdb-${movie.id}`
-    },
     meta: {
       tmdb_id: movie.id,
       vf: true,
@@ -54,7 +51,6 @@ async function getCandidates() {
     requests.push(
       discoverMovies({
         page,
-        with_original_language: "en,es,de,it,ja,ko,zh,hi,pt,ru,nl,sv,da,no,pl,tr",
         without_genres: [...CONFIG.excludedMovieGenres].join(",")
       })
     );
@@ -88,7 +84,6 @@ export async function buildCatalog(catalogId) {
     if (genreId && !(movie.genre_ids || []).includes(genreId)) continue;
 
     const year = String(movie.release_date || "").slice(0, 4);
-
     if (catalogId === "nouveautes-vf-2026" && year !== "2026") continue;
     if (catalogId === "vf-2025" && year !== "2025") continue;
 
