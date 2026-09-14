@@ -29,7 +29,8 @@ jobs:
 
       - name: Sync VF index
         env:
-          FULL_SYNC: ${{ github.event.inputs.full_sync == 'true' && '1' || '0' }}
+  TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+  FULL_SYNC: ${{ github.event.inputs.full_sync == 'true' && '1' || '0' }}
         run: node scripts/sync-vf-index.js
 
       - name: Commit VF index
