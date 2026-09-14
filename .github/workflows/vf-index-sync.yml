@@ -43,3 +43,11 @@ jobs:
             git commit -m "Update VF index"
             git push
           fi
+
+      - name: Sync to Hugging Face
+        uses: huggingface/hub-sync@v0.1.0
+        with:
+          github_repo_id: ${{ github.repository }}
+          huggingface_repo_id: Lambda666/Films-VF-Nuvio
+          hf_token: ${{ secrets.HF_TOKEN }}
+          space_sdk: docker
