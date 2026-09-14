@@ -16,7 +16,14 @@ const manifest = {
   name: "Films VF Nuvio",
   description:
     "Catalogue dynamique dédié aux films étrangers doublés en français.",
-  resources: ["catalog", "meta"],
+  resources: [
+  "catalog",
+  {
+    name: "meta",
+    types: ["movie"],
+    idPrefixes: ["tmdb-"]
+  }
+],
   types: ["movie"],
 
   catalogs: catalogs.map(([id, name]) => ({
