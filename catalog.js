@@ -7,10 +7,34 @@ const BACKDROP_BASE = "https://image.tmdb.org/t/p/w1280";
 const BETTERPOSTER_BASE =
   "https://btttr.cc/poster-qa/imdb/poster-default";
 
-// Cache TMDB en mémoire.
-// Il évite de refaire les mêmes appels pendant 5 minutes.
-const MOVIE_CACHE_TTL = 5 * 60 * 1000;
+/*
+ * Cache TMDB :
+ * garde les fiches déjà récupérées pendant 10 minutes.
+ */
+const MOVIE_CACHE_TTL = 10 * 60 * 1000;
 const movieCache = new Map();
+
+/*
+ * Requêtes TMDB actuellement en cours.
+ * Cela évite que deux catalogues demandent
+ * le même film en même temps.
+ */
+const moviePending = new Map();
+
+/*
+ * Cache des catalogues construits.
+ * Une fois le catalogue construit, Nuvio
+ * récupère directement le résultat pendant 15 minutes.
+ */
+const CATALOG_CACHE_TTL = 15 * 60 * 1000;
+const catalogCache = new Map();
+
+/*
+ * Construction actuellement en cours par catalogue.
+ * Si Nuvio fait deux demandes identiques simultanément,
+ * une seule construction est effectuée.
+ */
+const catalogPending = new Map();
 
 async function getCachedMovie(tmdbId) {
   const cached = movieCache.get(tmdbId);
@@ -19,19 +43,33 @@ async function getCachedMovie(tmdbId) {
     return cached.movie;
   }
 
-  try {
-    const movie = await getMovie(tmdbId);
+  const pending = moviePending.get(tmdbId);
 
-    movieCache.set(tmdbId, {
-      movie,
-      time: Date.now()
-    });
-
-    return movie;
-  } catch (error) {
-    movieCache.delete(tmdbId);
-    throw error;
+  if (pending) {
+    return pending;
   }
+
+  const request = (async () => {
+    try {
+      const movie = await getMovie(tmdbId);
+
+      movieCache.set(tmdbId, {
+        movie,
+        time: Date.now()
+      });
+
+      return movie;
+    } catch (error) {
+      movieCache.delete(tmdbId);
+      throw error;
+    } finally {
+      moviePending.delete(tmdbId);
+    }
+  })();
+
+  moviePending.set(tmdbId, request);
+
+  return request;
 }
 
 function getYear(movie, vfRecord) {
@@ -109,7 +147,6 @@ function toMeta(movie, vfRecord) {
     type: "movie",
     name: movie.title || movie.original_title,
 
-    // BetterPoster directement dans le catalogue standalone
     poster: getPoster(movie),
 
     background: movie.backdrop_path
@@ -138,7 +175,6 @@ function toMeta(movie, vfRecord) {
   };
 }
 
-// Traitement parallèle limité pour garder un chargement raisonnable.
 async function mapWithConcurrency(items, concurrency, mapper) {
   const results = new Array(items.length);
   let nextIndex = 0;
@@ -169,7 +205,7 @@ async function mapWithConcurrency(items, concurrency, mapper) {
   return results;
 }
 
-export async function buildCatalog(catalogId) {
+async function buildCatalogInternal(catalogId) {
   const verifiedIds = await getVerifiedVFIds();
 
   if (!verifiedIds.size) {
@@ -178,12 +214,14 @@ export async function buildCatalog(catalogId) {
 
   const ids = [...verifiedIds];
 
-  // 10 appels TMDB simultanés :
-  // beaucoup plus rapide que les appels un par un,
-  // sans envoyer une rafale incontrôlée.
+  /*
+   * 15 appels simultanés :
+   * suffisamment rapide pour le démarrage,
+   * sans lancer une rafale énorme vers TMDB.
+   */
   const processed = await mapWithConcurrency(
     ids,
-    10,
+    15,
     async (tmdbId) => {
       const movie = await getCachedMovie(tmdbId);
 
@@ -242,10 +280,61 @@ export async function buildCatalog(catalogId) {
 
   results.sort((a, b) => b.score - a.score);
 
-  // IMPORTANT :
-  // aucun .slice(0, 40)
-  // Tous les films admissibles sont conservés.
+  /*
+   * Aucun nombre maximum artificiel.
+   * Tous les films admissibles sont conservés.
+   */
   return results.map(({ movie, vfRecord }) =>
     toMeta(movie, vfRecord)
   );
+}
+
+export async function buildCatalog(catalogId) {
+  /*
+   * 1. Si le catalogue est déjà construit récemment,
+   *    on le renvoie immédiatement.
+   */
+  const cached = catalogCache.get(catalogId);
+
+  if (
+    cached &&
+    Date.now() - cached.time < CATALOG_CACHE_TTL
+  ) {
+    return cached.metas;
+  }
+
+  /*
+   * 2. Si une construction est déjà en cours,
+   *    on attend celle-ci au lieu d'en lancer une deuxième.
+   */
+  const pending = catalogPending.get(catalogId);
+
+  if (pending) {
+    return pending;
+  }
+
+  /*
+   * 3. Construction unique du catalogue.
+   */
+  const request = (async () => {
+    try {
+      const metas = await buildCatalogInternal(catalogId);
+
+      catalogCache.set(catalogId, {
+        metas,
+        time: Date.now()
+      });
+
+      return metas;
+    } catch (error) {
+      console.error(`Catalog ${catalogId} error:`, error);
+      throw error;
+    } finally {
+      catalogPending.delete(catalogId);
+    }
+  })();
+
+  catalogPending.set(catalogId, request);
+
+  return request;
 }
