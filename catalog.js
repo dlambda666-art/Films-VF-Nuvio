@@ -215,13 +215,12 @@ async function buildCatalogInternal(catalogId) {
   const ids = [...verifiedIds];
 
   /*
-   * 15 appels simultanés :
-   * suffisamment rapide pour le démarrage,
-   * sans lancer une rafale énorme vers TMDB.
+   * 20 appels simultanés :
+   * démarrage plus rapide tout en restant raisonnable pour TMDB.
    */
   const processed = await mapWithConcurrency(
     ids,
-    15,
+    20,
     async (tmdbId) => {
       const movie = await getCachedMovie(tmdbId);
 
