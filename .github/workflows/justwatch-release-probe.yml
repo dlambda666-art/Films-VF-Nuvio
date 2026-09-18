@@ -2,6 +2,9 @@ name: JustWatch release probe
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - lab/justwatch-release-probe
 
 jobs:
   probe:
