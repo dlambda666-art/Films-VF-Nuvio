@@ -2,17 +2,30 @@ const TESTS = [
   {
     name: "L'Odyssée 2026",
     tmdbId: 1368337,
-    url: "https://www.justwatch.com/be/film/lodyssee-2026"
+    urls: [
+      { locale: "be", url: "https://www.justwatch.com/be/film/lodyssee-2026" },
+      { locale: "fr", url: "https://www.justwatch.com/fr/film/lodyssee-2026" }
+    ],
+    expectedYear: 2026,
+    expectedTitle: "l'odyssée"
   },
   {
     name: "Spider-Man: Brand New Day",
     tmdbId: 969681,
-    url: "https://www.justwatch.com/be/film/untitled-spider-man-sequel"
+    urls: [
+      { locale: "be", url: "https://www.justwatch.com/be/film/untitled-spider-man-sequel" }
+    ],
+    expectedYear: 2026,
+    expectedTitle: "spider-man: brand new day"
   },
   {
     name: "Resident Evil 2026",
     tmdbId: 1423191,
-    url: "https://www.justwatch.com/be/film/resident-evil"
+    urls: [
+      { locale: "be", url: "https://www.justwatch.com/be/film/resident-evil" }
+    ],
+    expectedYear: 2026,
+    expectedTitle: "resident evil"
   }
 ];
 
@@ -29,77 +42,122 @@ function htmlToText(html) {
     .trim();
 }
 
-function extractReleaseDate(text) {
-  const anchors = [
-    "sera disponible",
-    "sera disponible sur",
-    "sortie numérique",
-    "Digital Release"
-  ];
+function normalize(s) {
+  return String(s || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
 
-  for (const anchor of anchors) {
-    const index = text.toLowerCase().indexOf(anchor.toLowerCase());
-    if (index >= 0) {
-      const window = text.slice(index, index + 800);
-      const iso = window.match(/\b20\d{2}-\d{2}-\d{2}\b/);
-      if (iso) return iso[0];
-
-      const fr = window.match(
-        /\b\d{1,2}\s+(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\s+20\d{2}\b/i
-      );
-      if (fr) return fr[0];
-    }
-  }
-
-  return null;
+function extractHeading(text) {
+  const m = text.match(/^\s*([^|]+?)\s*\((\d{4})\)/);
+  return m ? { title: m[1].trim(), year: Number(m[2]) } : null;
 }
 
 function extractAvailability(text) {
   const lower = text.toLowerCase();
 
-  return {
-    notAvailable:
-      lower.includes("n'est pas disponible en streaming") ||
-      lower.includes("n’est pas disponible en streaming"),
-    hasDigitalOffer:
-      lower.includes("location") ||
-      lower.includes("achat") ||
-      lower.includes("streaming")
-  };
+  const notAvailable =
+    lower.includes("n'est pas disponible pour le pays belgique") ||
+    lower.includes("n’est pas disponible pour le pays belgique") ||
+    lower.includes("nous n'avons trouvé aucune option de streaming dans belgique") ||
+    lower.includes("nous n’avons trouvé aucune option de streaming dans belgique");
+
+  const explicitOffers =
+    /(?:\b(?:location|achat)\b[^\n]{0,120}\d[,.]\d{2}\s*€)/i.test(text) ||
+    /(?:\b(?:abonnement|streaming)\b[^\n]{0,120}\d[,.]\d{2}\s*€)/i.test(text);
+
+  return { notAvailable, hasExplicitOffer: explicitOffers };
 }
 
-async function probe(test) {
-  const response = await fetch(test.url, {
-    headers: {
-      "user-agent": "Centralyser-FrenchPulse-lab/1.0"
-    }
+function extractDigitalReleaseDate(text) {
+  const lower = text.toLowerCase();
+  const anchors = [
+    "sera disponible sur",
+    "sera disponible à partir du",
+    "sera disponible dès le",
+    "sortie numérique",
+    "digital release"
+  ];
+
+  for (const anchor of anchors) {
+    const index = lower.indexOf(anchor);
+    if (index < 0) continue;
+
+    const window = text.slice(index, index + 500);
+
+    const iso = window.match(/\b20\d{2}-\d{2}-\d{2}\b/);
+    if (iso) return { date: iso[0], matchedAnchor: anchor };
+
+    const fr = window.match(
+      /\b\d{1,2}\s+(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\s+20\d{2}\b/i
+    );
+    if (fr) return { date: fr[0], matchedAnchor: anchor };
+  }
+
+  return null;
+}
+
+async function fetchPage(candidate) {
+  const response = await fetch(candidate.url, {
+    headers: { "user-agent": "Centralyser-FrenchPulse-lab/2.0" }
   });
 
   if (!response.ok) {
-    throw new Error(`${response.status} ${response.statusText}`);
+    return {
+      locale: candidate.locale,
+      url: candidate.url,
+      httpStatus: response.status,
+      error: `${response.status} ${response.statusText}`
+    };
   }
 
   const html = await response.text();
   const text = htmlToText(html);
+  const heading = extractHeading(text);
+  const availability = extractAvailability(text);
+  const digitalRelease = extractDigitalReleaseDate(text);
+
+  const titleMatch = heading
+    ? normalize(heading.title).includes(normalize(candidate.expectedTitle)) ||
+      normalize(candidate.expectedTitle).includes(normalize(heading.title))
+    : false;
+
+  const yearMatch = heading?.year === candidate.expectedYear;
 
   return {
-    name: test.name,
-    tmdbId: test.tmdbId,
-    url: test.url,
+    locale: candidate.locale,
+    url: candidate.url,
     httpStatus: response.status,
-    releaseDate: extractReleaseDate(text),
-    ...extractAvailability(text)
+    pageTitle: heading?.title || null,
+    pageYear: heading?.year || null,
+    titleMatch,
+    yearMatch,
+    ...availability,
+    digitalReleaseDate: digitalRelease?.date || null,
+    digitalReleaseMatchedAnchor: digitalRelease?.matchedAnchor || null
   };
 }
 
 for (const test of TESTS) {
-  try {
-    console.log(JSON.stringify(await probe(test)));
-  } catch (error) {
-    console.error(JSON.stringify({
-      name: test.name,
-      url: test.url,
-      error: error.message
-    }));
+  const results = [];
+
+  for (const candidate of test.urls) {
+    const result = await fetchPage({
+      ...candidate,
+      expectedYear: test.expectedYear,
+      expectedTitle: test.expectedTitle
+    });
+    results.push(result);
+
+    if (result.httpStatus === 200 && result.titleMatch && result.yearMatch) break;
   }
+
+  console.log(JSON.stringify({
+    name: test.name,
+    tmdbId: test.tmdbId,
+    results
+  }));
 }
