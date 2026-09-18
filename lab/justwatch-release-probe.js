@@ -510,8 +510,6 @@ for (let i = 0; i < sourceItems.length; i += CONCURRENCY) {
   console.log(`Progress: ${Math.min(i + batch.length, sourceItems.length)}/${sourceItems.length}`);
 }
 const radarDocument = {
-
-const radarDocument = {
   schema_version: 1,
   generated_at: new Date().toISOString(),
   source: {
