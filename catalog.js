@@ -333,15 +333,21 @@ async function buildCatalogInternal(catalogId) {
   return results.map(({ movie, vfRecord }) => {
     const meta = toMeta(movie, vfRecord);
     const status = radar.get(Number(movie.id));
-    if (!status) return meta;
+    const catalogStatus =
+      catalogId === "nouveautes-vf"
+        ? "nouveaute_vf"
+        : status?.status || null;
+
+    if (!catalogStatus && !status) return meta;
+
     return {
       ...meta,
       meta: {
         ...meta.meta,
         quality: null,
-        status: status.status || null,
-        reason: status.reason || null,
-        digital_release_date: status.digital_release_date || null
+        status: catalogStatus,
+        reason: status?.reason || null,
+        digital_release_date: status?.digital_release_date || null
       }
     };
   });
