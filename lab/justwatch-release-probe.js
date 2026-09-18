@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 import { writeFile } from "node:fs/promises";
 
 const RADAR_OUTPUT = "lab/justwatch-radar.json";
@@ -213,6 +214,53 @@ function extractDigitalReleaseDate(text) {
 
   return null;
 }
+
+
+function runSelfTests() {
+  const countryUnavailable = extractAvailability(
+    "Ce film n’est pas disponible pour le pays Belgique. Nous n’avons trouvé aucune option de streaming dans Belgique."
+  );
+  assert.equal(countryUnavailable.notAvailable, true);
+  assert.equal(countryUnavailable.hasExplicitOffer, false);
+
+  const countryUnavailableAscii = extractAvailability(
+    "Ce film n'est pas disponible pour le pays Belgique."
+  );
+  assert.equal(countryUnavailableAscii.notAvailable, true);
+
+  const explicitOffer = extractAvailability(
+    "Actuellement disponible sur 5 services de streaming."
+  );
+  assert.equal(explicitOffer.hasExplicitOffer, true);
+  assert.equal(explicitOffer.notAvailable, false);
+
+  const futureRelease = extractDigitalReleaseDate(
+    "Ce film n'est pas disponible en streaming. Il sera disponible sur 18 septembre 2026."
+  );
+  assert.deepEqual(futureRelease, {
+    date: "18 septembre 2026",
+    matchedAnchor: "sera disponible sur"
+  });
+
+  const heading = extractHeading("The Accountant 2 (2025) | JustWatch");
+  assert.deepEqual(heading, { title: "The Accountant 2", year: 2025 });
+
+  assert.equal(normalize("L’Odyssée — Le Temple des Morts"), "l odyssee le temple des morts");
+
+  console.log(JSON.stringify({
+    selfTests: "passed",
+    checks: [
+      "country_unavailable_curly_apostrophe",
+      "country_unavailable_ascii_apostrophe",
+      "explicit_streaming_offer",
+      "future_french_release_date",
+      "title_year_heading",
+      "accent_and_punctuation_normalization"
+    ]
+  }));
+}
+
+runSelfTests();
 
 async function loadVFIndex() {
   const response = await fetch(VF_INDEX_URL, {
