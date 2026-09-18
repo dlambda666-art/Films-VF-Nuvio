@@ -264,7 +264,7 @@ runSelfTests();
 
 async function loadVFIndex() {
   const response = await fetch(VF_INDEX_URL, {
-    headers: { "user-agent": "Centralyser-FrenchPulse-lab/4.0" }
+    headers: { "user-agent": "Centralyser-FrenchPulse-lab/5.0" }
   });
 
   if (!response.ok) throw new Error(`VF index ${response.status}`);
@@ -282,7 +282,7 @@ async function loadVFIndex() {
 }
 
 async function fetchPage(candidate, test) {
-  const response = await fetch(candidate.url, {
+  const response = await fetchWithRetry(candidate.url, {
     headers: { "user-agent": "Centralyser-FrenchPulse-lab/4.0" }
   });
 
@@ -385,13 +385,33 @@ const RADAR_MODE = process.env.RADAR_MODE || "sample";
 
 function extractJustWatchLinks(html, locale) {
   const links = new Set();
-  const pattern = new RegExp('href=["\\\']((?:https?:\\/\\/www\\.justwatch\\.com)?\\/' + locale + '\\/film\\/[^"\\\'?#]+)', 'gi');
+  const pattern = new RegExp('href=["\\']((?:https?:\\/\\/www\\.justwatch\\.com)?\\/' + locale + '\\/film\\/[^"\\'?#]+)', 'gi');
   for (const match of html.matchAll(pattern)) {
     let url = match[1];
     if (url.startsWith('/')) url = 'https://www.justwatch.com' + url;
     links.add(url);
   }
-  return [...links].slice(0, 12);
+  return [...links];
+}
+
+function slugifyTitle(title) {
+  return normalize(title)
+    .replace(/\\s+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function directJustWatchCandidates(title, year, locale) {
+  const slug = slugifyTitle(title);
+  if (!slug) return [];
+  const slugs = new Set([slug, year ? slug + '-' + year : ''].filter(Boolean));
+  return [...slugs].map(candidateSlug => ({
+    locale,
+    scope: locale,
+    url: 'https://www.justwatch.com/' + locale + '/film/' + candidateSlug,
+    score: 100,
+    expectedYear: year,
+    direct: true
+  }));
 }
 
 function slugScore(url, expectedTitle) {
@@ -408,44 +428,71 @@ function slugScore(url, expectedTitle) {
 function buildSearchQueries(title, year) {
   const clean = String(title || '').trim();
   const queries = [
-    clean,
     year ? clean + ' ' + year : clean,
-    clean.replace(/[:|/]/g, ' '),
-    clean.replace(/\\b(?:film|movie)\\b/gi, ' ').replace(/[:|/]/g, ' ')
+    clean
   ];
   return [...new Set(queries.map(q => q.replace(/\\s+/g, ' ').trim()).filter(Boolean))];
 }
 
+async function fetchWithRetry(url, options = {}, attempts = 3) {
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    const response = await fetch(url, options);
+    if (![429, 500, 502, 503, 504].includes(response.status) || attempt === attempts) return response;
+    const retryAfter = Number(response.headers.get('retry-after') || 0);
+    const delayMs = retryAfter > 0 ? Math.min(retryAfter * 1000, 8000) : attempt * 1000;
+    await new Promise(resolve => setTimeout(resolve, delayMs));
+  }
+}
+
 async function discoverJustWatchCandidates(title, year, locale) {
-  const candidates = new Map();
+  const candidates = new Map(
+    directJustWatchCandidates(title, year, locale).map(candidate => [candidate.url, candidate])
+  );
   for (const query of buildSearchQueries(title, year)) {
     const searchUrl = 'https://www.justwatch.com/' + locale + '/recherche?q=' + encodeURIComponent(query);
-    const response = await fetch(searchUrl, { headers: { 'user-agent': 'Centralyser-FrenchPulse-lab/4.0' } });
+    const response = await fetchWithRetry(searchUrl, {
+      headers: { 'user-agent': 'Centralyser-FrenchPulse-lab/5.0' }
+    });
     if (!response.ok) continue;
     const html = await response.text();
     for (const url of extractJustWatchLinks(html, locale)) {
       const score = slugScore(url, title);
       const current = candidates.get(url);
       if (!current || score > current.score) {
-        candidates.set(url, { locale, scope: locale, url, score, expectedYear: year });
+        candidates.set(url, { locale, scope: locale, url, score, expectedYear: year, direct: false });
       }
     }
   }
-  return [...candidates.values()].sort((a, b) => b.score - a.score).slice(0, 24);
+  return [...candidates.values()].sort((a, b) => b.score - a.score).slice(0, 12);
 }
 
 async function buildFullTest(item) {
   const title = item.title || '';
   const year = Number(item.year || 0);
+  const alternateTitle = item.original_title || item.originalTitle || item.original_name || '';
+  const searchTitles = [...new Set([title, alternateTitle].map(value => String(value || '').trim()).filter(Boolean))];
+  const byLocale = {};
+
+  for (const locale of ['be', 'fr']) {
+    const localeCandidates = new Map();
+    for (const searchTitle of searchTitles) {
+      for (const candidate of directJustWatchCandidates(searchTitle, year, locale)) {
+        localeCandidates.set(candidate.url, candidate);
+      }
+      if (searchTitle === title) {
+        const discovered = await discoverJustWatchCandidates(searchTitle, year, locale);
+        for (const candidate of discovered) localeCandidates.set(candidate.url, candidate);
+      }
+    }
+    byLocale[locale] = [...localeCandidates.values()].sort((a, b) => b.score - a.score).slice(0, 12);
+  }
+
   return {
     name: title || 'TMDB ' + item.tmdb_id,
     tmdbId: Number(item.tmdb_id),
     expectedYear: year,
     expectedTitle: title,
-    urls: [
-      ...(await discoverJustWatchCandidates(title, year, 'be')),
-      ...(await discoverJustWatchCandidates(title, year, 'fr'))
-    ].slice(0, 16)
+    urls: [...byLocale.be, ...byLocale.fr]
   };
 }
 
@@ -475,7 +522,7 @@ async function processRadarItem(sourceItem) {
   for (const candidate of test.urls) {
     const result = await fetchPage(candidate, test);
     results.push(result);
-    if (result.validPage && result.scope === "be") break;
+    if (result.validPage) break;
   }
   const selected = [...results].reverse().find(x => x.validPage) || results[results.length - 1];
   const vfRecord = vfIndex.get(test.tmdbId) || null;
