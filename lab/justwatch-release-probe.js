@@ -205,9 +205,19 @@ for (const test of TESTS) {
     if (result.validPage && result.scope === "be") break;
   }
 
+  const selected = [...results].reverse().find(x => x.validPage) || results[results.length - 1];
+  const radar = selected
+    ? deriveRadar(selected)
+    : { status: "unresolved", reason: "no_result" };
+
   console.log(JSON.stringify({
     name: test.name,
     tmdbId: test.tmdbId,
+    selectedScope: selected?.scope || null,
+    selectedValidPage: selected?.validPage || false,
+    selectedNotAvailable: selected?.notAvailable ?? null,
+    selectedDigitalReleaseDate: selected?.digitalReleaseDate || null,
+    radar,
     results
   }));
 }
