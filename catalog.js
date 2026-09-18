@@ -286,6 +286,20 @@ async function buildCatalogInternal(catalogId) {
         return null;
       }
 
+      // À surveiller = VF confirmée mais pas encore disponible
+      // selon le snapshot JustWatch du lab.
+      if (catalogId === "a-surveiller") {
+        const radar = await getRadarMap();
+        const status = radar.get(Number(movie.id));
+
+        if (
+          !status ||
+          status.status !== "a_surveiller"
+        ) {
+          return null;
+        }
+      }
+
       return {
         movie,
         vfRecord,
