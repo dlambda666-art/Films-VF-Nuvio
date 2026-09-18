@@ -1,3 +1,5 @@
+const VF_INDEX_URL = "https://raw.githubusercontent.com/dlambda666-art/Films-VF-Nuvio/main/vf-index.json";
+
 const TESTS = [
   {
     name: "L'Odyssée 2026",
@@ -43,14 +45,14 @@ const TESTS = [
 
 function htmlToText(html) {
   return html
-    .replace(/<script[\s\S]*?<\/script>/gi, " ")
-    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<script[\\s\\S]*?<\\/script>/gi, " ")
+    .replace(/<style[\\s\\S]*?<\\/style>/gi, " ")
     .replace(/<[^>]+>/g, " ")
     .replace(/&nbsp;/g, " ")
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
     .replace(/&amp;/g, "&")
-    .replace(/\s+/g, " ")
+    .replace(/\\s+/g, " ")
     .trim();
 }
 
@@ -58,13 +60,13 @@ function normalize(s) {
   return String(s || "")
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[\\u0300-\\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, " ")
     .trim();
 }
 
 function extractHeading(text) {
-  const m = text.match(/^\s*([^|]+?)\s*\((\d{4})\)/);
+  const m = text.match(/^\\s*([^|]+?)\\s*\\((\\d{4})\\)/);
   return m ? { title: m[1].trim(), year: Number(m[2]) } : null;
 }
 
@@ -78,8 +80,8 @@ function extractAvailability(text) {
     lower.includes("aucune option de streaming");
 
   const explicitOffers =
-    /(?:\b(?:location|achat)\b[^\n]{0,120}\d[,.]\d{2}\s*€)/i.test(text) ||
-    /(?:\b(?:abonnement|streaming)\b[^\n]{0,120}\d[,.]\d{2}\s*€)/i.test(text);
+    /(?:\\b(?:location|achat)\\b[^\\n]{0,120}\\d[,.]\\d{2}\\s*€)/i.test(text) ||
+    /(?:\\b(?:abonnement|streaming)\\b[^\\n]{0,120}\\d[,.]\\d{2}\\s*€)/i.test(text);
 
   return { notAvailable, hasExplicitOffer: explicitOffers };
 }
@@ -100,11 +102,11 @@ function extractDigitalReleaseDate(text) {
 
     const window = text.slice(index, index + 500);
 
-    const iso = window.match(/\b20\d{2}-\d{2}-\d{2}\b/);
+    const iso = window.match(/\\b20\\d{2}-\\d{2}-\\d{2}\\b/);
     if (iso) return { date: iso[0], matchedAnchor: anchor };
 
     const fr = window.match(
-      /\b\d{1,2}\s+(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\s+20\d{2}\b/i
+      /\\b\\d{1,2}\\s+(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\\s+20\\d{2}\\b/i
     );
     if (fr) return { date: fr[0], matchedAnchor: anchor };
   }
@@ -112,9 +114,28 @@ function extractDigitalReleaseDate(text) {
   return null;
 }
 
+async function loadVFIndex() {
+  const response = await fetch(VF_INDEX_URL, {
+    headers: { "user-agent": "Centralyser-FrenchPulse-lab/4.0" }
+  });
+
+  if (!response.ok) throw new Error(`VF index ${response.status}`);
+
+  const payload = await response.json();
+  const items = Array.isArray(payload) ? payload : payload.items;
+
+  if (!Array.isArray(items)) throw new Error("Invalid VF index format");
+
+  return new Map(
+    items
+      .filter(item => item && item.tmdb_id != null)
+      .map(item => [Number(item.tmdb_id), item])
+  );
+}
+
 async function fetchPage(candidate, test) {
   const response = await fetch(candidate.url, {
-    headers: { "user-agent": "Centralyser-FrenchPulse-lab/3.0" }
+    headers: { "user-agent": "Centralyser-FrenchPulse-lab/4.0" }
   });
 
   if (!response.ok) {
@@ -158,7 +179,14 @@ async function fetchPage(candidate, test) {
   };
 }
 
-function deriveRadar(result, now = new Date()) {
+function deriveRadar(result, vfRecord, now = new Date()) {
+  if (!vfRecord || vfRecord.vf_confirmed !== true) {
+    return {
+      status: "unresolved",
+      reason: "vf_not_confirmed"
+    };
+  }
+
   if (!result.validPage) {
     return {
       status: "unresolved",
@@ -193,7 +221,7 @@ function deriveRadar(result, now = new Date()) {
   if (result.hasExplicitOffer === true) {
     return {
       status: "nouveaute_vf",
-      reason: "explicit_legal_offer_detected",
+      reason: "vf_confirmed_and_explicit_legal_offer_detected",
       digitalReleaseReached: true
     };
   }
@@ -204,6 +232,8 @@ function deriveRadar(result, now = new Date()) {
     digitalReleaseReached: null
   };
 }
+
+const vfIndex = await loadVFIndex();
 
 for (const test of TESTS) {
   const results = [];
@@ -216,13 +246,16 @@ for (const test of TESTS) {
   }
 
   const selected = [...results].reverse().find(x => x.validPage) || results[results.length - 1];
+  const vfRecord = vfIndex.get(test.tmdbId) || null;
   const radar = selected
-    ? deriveRadar(selected)
+    ? deriveRadar(selected, vfRecord)
     : { status: "unresolved", reason: "no_result" };
 
   console.log(JSON.stringify({
     name: test.name,
     tmdbId: test.tmdbId,
+    vfConfirmed: vfRecord?.vf_confirmed === true,
+    vfSource: vfRecord?.source || null,
     selectedScope: selected?.scope || null,
     selectedValidPage: selected?.validPage || false,
     selectedNotAvailable: selected?.notAvailable ?? null,
