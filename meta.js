@@ -1,9 +1,24 @@
 import { getMovie } from "./tmdb.js";
 import { getVFRecord } from "./vf.js";
+import { readFile } from "node:fs/promises";
 
 const BACKDROP_BASE = "https://image.tmdb.org/t/p/w1280";
 const BETTERPOSTER_BASE =
   "https://btttr.cc/poster-qa/imdb/poster-default";
+
+let radarCache = null;
+
+async function getRadarMap() {
+  if (radarCache) return radarCache;
+  try {
+    const raw = await readFile(new URL("./lab/justwatch-radar.json", import.meta.url), "utf8");
+    const doc = JSON.parse(raw);
+    radarCache = new Map((doc.items || []).map(item => [Number(item.tmdb_id), item]));
+  } catch {
+    radarCache = new Map();
+  }
+  return radarCache;
+}
 
 export async function buildMeta(id) {
   const match = String(id).match(/^tmdb:(\d+)$/);
@@ -38,6 +53,9 @@ export async function buildMeta(id) {
       ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
       : undefined;
 
+  const radar = await getRadarMap();
+  const status = radar.get(tmdbId);
+
   return {
     id,
     type: "movie",
@@ -59,7 +77,12 @@ export async function buildMeta(id) {
       vf: true,
       vf_country: vf.vf_country || null,
       vf_source: vf.source || null,
-      vf_verified: true
+      vf_verified: true,
+      frenchpulse_meta_version: 1,
+      quality: null,
+      status: status?.status || null,
+      reason: status?.reason || null,
+      digital_release_date: status?.digital_release_date || null
     }
   };
 }
