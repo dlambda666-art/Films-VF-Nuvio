@@ -3,8 +3,8 @@ const TESTS = [
     name: "L'Odyssée 2026",
     tmdbId: 1368337,
     urls: [
-      { locale: "be", url: "https://www.justwatch.com/be/film/lodyssee-2026" },
-      { locale: "fr", url: "https://www.justwatch.com/fr/film/lodyssee-2026" }
+      { locale: "be", url: "https://www.justwatch.com/be/film/lodyssee-2026", scope: "be" },
+      { locale: "fr", url: "https://www.justwatch.com/fr/film/lodyssee-2026", scope: "fr" }
     ],
     expectedYear: 2026,
     expectedTitle: "l'odyssée"
@@ -13,7 +13,8 @@ const TESTS = [
     name: "Spider-Man: Brand New Day",
     tmdbId: 969681,
     urls: [
-      { locale: "be", url: "https://www.justwatch.com/be/film/untitled-spider-man-sequel" }
+      { locale: "be", url: "https://www.justwatch.com/be/film/untitled-spider-man-sequel", scope: "be" },
+      { locale: "fr", url: "https://www.justwatch.com/fr/film/spider-man-4", scope: "fr" }
     ],
     expectedYear: 2026,
     expectedTitle: "spider-man: brand new day"
@@ -22,7 +23,8 @@ const TESTS = [
     name: "Resident Evil 2026",
     tmdbId: 1423191,
     urls: [
-      { locale: "be", url: "https://www.justwatch.com/be/film/resident-evil" }
+      { locale: "be", url: "https://www.justwatch.com/be/film/resident-evil", scope: "be" },
+      { locale: "fr", url: "https://www.justwatch.com/fr/film/resident-evil", scope: "fr" }
     ],
     expectedYear: 2026,
     expectedTitle: "resident evil"
@@ -60,10 +62,10 @@ function extractAvailability(text) {
   const lower = text.toLowerCase();
 
   const notAvailable =
-    lower.includes("n'est pas disponible pour le pays belgique") ||
-    lower.includes("n’est pas disponible pour le pays belgique") ||
-    lower.includes("nous n'avons trouvé aucune option de streaming dans belgique") ||
-    lower.includes("nous n’avons trouvé aucune option de streaming dans belgique");
+    lower.includes("n'est pas disponible en streaming") ||
+    lower.includes("n’est pas disponible en streaming") ||
+    lower.includes("aucune offre pour") ||
+    lower.includes("aucune option de streaming");
 
   const explicitOffers =
     /(?:\b(?:location|achat)\b[^\n]{0,120}\d[,.]\d{2}\s*€)/i.test(text) ||
@@ -100,14 +102,15 @@ function extractDigitalReleaseDate(text) {
   return null;
 }
 
-async function fetchPage(candidate) {
+async function fetchPage(candidate, test) {
   const response = await fetch(candidate.url, {
-    headers: { "user-agent": "Centralyser-FrenchPulse-lab/2.0" }
+    headers: { "user-agent": "Centralyser-FrenchPulse-lab/3.0" }
   });
 
   if (!response.ok) {
     return {
       locale: candidate.locale,
+      scope: candidate.scope,
       url: candidate.url,
       httpStatus: response.status,
       error: `${response.status} ${response.statusText}`
@@ -118,24 +121,28 @@ async function fetchPage(candidate) {
   const text = htmlToText(html);
   const heading = extractHeading(text);
   const availability = extractAvailability(text);
-  const digitalRelease = extractDigitalReleaseDate(text);
 
   const titleMatch = heading
-    ? normalize(heading.title).includes(normalize(candidate.expectedTitle)) ||
-      normalize(candidate.expectedTitle).includes(normalize(heading.title))
+    ? normalize(heading.title).includes(normalize(test.expectedTitle)) ||
+      normalize(test.expectedTitle).includes(normalize(heading.title))
     : false;
 
-  const yearMatch = heading?.year === candidate.expectedYear;
+  const yearMatch = heading?.year === test.expectedYear;
+  const validPage = titleMatch && yearMatch;
+  const digitalRelease = validPage ? extractDigitalReleaseDate(text) : null;
 
   return {
     locale: candidate.locale,
+    scope: candidate.scope,
     url: candidate.url,
     httpStatus: response.status,
     pageTitle: heading?.title || null,
     pageYear: heading?.year || null,
     titleMatch,
     yearMatch,
-    ...availability,
+    validPage,
+    notAvailable: validPage ? availability.notAvailable : null,
+    hasExplicitOffer: validPage ? availability.hasExplicitOffer : null,
     digitalReleaseDate: digitalRelease?.date || null,
     digitalReleaseMatchedAnchor: digitalRelease?.matchedAnchor || null
   };
@@ -145,14 +152,10 @@ for (const test of TESTS) {
   const results = [];
 
   for (const candidate of test.urls) {
-    const result = await fetchPage({
-      ...candidate,
-      expectedYear: test.expectedYear,
-      expectedTitle: test.expectedTitle
-    });
+    const result = await fetchPage(candidate, test);
     results.push(result);
 
-    if (result.httpStatus === 200 && result.titleMatch && result.yearMatch) break;
+    if (result.validPage && result.scope === "be") break;
   }
 
   console.log(JSON.stringify({
