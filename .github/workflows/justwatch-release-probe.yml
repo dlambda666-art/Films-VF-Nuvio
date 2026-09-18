@@ -15,3 +15,8 @@ jobs:
         with:
           node-version: 20
       - run: node lab/justwatch-release-probe.js
+      - uses: actions/upload-artifact@v4
+        with:
+          name: justwatch-radar
+          path: lab/justwatch-radar.json
+          if-no-files-found: error
