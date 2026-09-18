@@ -471,28 +471,19 @@ async function buildFullTest(item) {
   const year = Number(item.year || 0);
   const alternateTitle = item.original_title || item.originalTitle || item.original_name || '';
   const searchTitles = [...new Set([title, alternateTitle].map(value => String(value || '').trim()).filter(Boolean))];
-  const byLocale = {};
-
-  for (const locale of ['be', 'fr']) {
-    const localeCandidates = new Map();
-    for (const searchTitle of searchTitles) {
-      for (const candidate of directJustWatchCandidates(searchTitle, year, locale)) {
-        localeCandidates.set(candidate.url, candidate);
-      }
-      if (searchTitle === title) {
-        const discovered = await discoverJustWatchCandidates(searchTitle, year, locale);
-        for (const candidate of discovered) localeCandidates.set(candidate.url, candidate);
-      }
-    }
-    byLocale[locale] = [...localeCandidates.values()].sort((a, b) => b.score - a.score).slice(0, 12);
-  }
 
   return {
     name: title || 'TMDB ' + item.tmdb_id,
     tmdbId: Number(item.tmdb_id),
     expectedYear: year,
     expectedTitle: title,
-    urls: [...byLocale.be, ...byLocale.fr]
+    searchTitles,
+    urls: [
+      ...directJustWatchCandidates(title, year, 'be'),
+      ...directJustWatchCandidates(title, year, 'fr'),
+      ...(alternateTitle ? directJustWatchCandidates(alternateTitle, year, 'be') : []),
+      ...(alternateTitle ? directJustWatchCandidates(alternateTitle, year, 'fr') : [])
+    ]
   };
 }
 
@@ -519,12 +510,33 @@ const CONCURRENCY = Number(process.env.RADAR_CONCURRENCY || 6);
 async function processRadarItem(sourceItem) {
   const test = await buildRadarTarget(sourceItem);
   const results = [];
-  for (const candidate of test.urls) {
-    const result = await fetchPage(candidate, test);
-    results.push(result);
-    if (result.validPage) break;
+  const seenUrls = new Set();
+
+  async function tryCandidates(candidates) {
+    for (const candidate of candidates) {
+      if (seenUrls.has(candidate.url)) continue;
+      seenUrls.add(candidate.url);
+      const result = await fetchPage(candidate, test);
+      results.push(result);
+      if (result.validPage) return true;
+    }
+    return false;
   }
-  const selected = [...results].reverse().find(x => x.validPage) || results[results.length - 1];
+
+  let found = await tryCandidates(test.urls);
+
+  if (!found && RADAR_MODE === 'full') {
+    for (const locale of ['be', 'fr']) {
+      for (const searchTitle of (test.searchTitles || [test.expectedTitle])) {
+        const discovered = await discoverJustWatchCandidates(searchTitle, test.expectedYear, locale);
+        found = await tryCandidates(discovered);
+        if (found) break;
+      }
+      if (found) break;
+    }
+  }
+
+  const selected = [...results].find(x => x.validPage) || results[results.length - 1];
   const vfRecord = vfIndex.get(test.tmdbId) || null;
   const radar = selected
     ? deriveRadar(selected, vfRecord)
