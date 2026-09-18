@@ -1,6 +1,7 @@
 import { getMovie } from "./tmdb.js";
 import { CONFIG } from "./config.js";
 import { getVerifiedVFIds, getVFRecord } from "./vf.js";
+import { readFile } from "node:fs/promises";
 
 const IMAGE_BASE = "https://image.tmdb.org/t/p/w500";
 const BACKDROP_BASE = "https://image.tmdb.org/t/p/w1280";
@@ -35,6 +36,19 @@ const catalogCache = new Map();
  * une seule construction est effectuée.
  */
 const catalogPending = new Map();
+
+let radarCache = null;
+async function getRadarMap() {
+  if (radarCache) return radarCache;
+  try {
+    const raw = await readFile(new URL("./lab/justwatch-radar.json", import.meta.url), "utf8");
+    const doc = JSON.parse(raw);
+    radarCache = new Map((doc.items || []).map(item => [Number(item.tmdb_id), item]));
+  } catch {
+    radarCache = new Map();
+  }
+  return radarCache;
+}
 
 async function getCachedMovie(tmdbId) {
   const cached = movieCache.get(tmdbId);
@@ -141,7 +155,7 @@ function getPoster(movie) {
   return undefined;
 }
 
-function toMeta(movie, vfRecord) {
+async function toMeta(movie, vfRecord) {
   return {
     id: `tmdb:${movie.id}`,
     type: "movie",
@@ -288,9 +302,22 @@ async function buildCatalogInternal(catalogId) {
    * Aucun nombre maximum artificiel.
    * Tous les films admissibles sont conservés.
    */
-  return results.map(({ movie, vfRecord }) =>
-    toMeta(movie, vfRecord)
-  );
+  const radar = await getRadarMap();
+  return results.map(({ movie, vfRecord }) => {
+    const meta = toMeta(movie, vfRecord);
+    const status = radar.get(Number(movie.id));
+    if (!status) return meta;
+    return {
+      ...meta,
+      meta: {
+        ...meta.meta,
+        quality: null,
+        status: status.status || null,
+        reason: status.reason || null,
+        digital_release_date: status.digital_release_date || null
+      }
+    };
+  });
 }
 
 export async function buildCatalog(catalogId) {
