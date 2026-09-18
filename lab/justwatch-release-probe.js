@@ -15,6 +15,36 @@ const TESTS = [
     expectedTitle: "conjuring l'heure du jugement"
   },
   {
+    name: "Les 4 Fantastiques : Premiers Pas 2025",
+    tmdbId: 617126,
+    urls: [
+      { locale: "be", url: "https://www.justwatch.com/be/film/the-fantastic-four", scope: "be" },
+      { locale: "fr", url: "https://www.justwatch.com/fr/film/the-fantastic-four", scope: "fr" }
+    ],
+    expectedYear: 2025,
+    expectedTitle: "les 4 fantastiques premiers pas"
+  },
+  {
+    name: "Sinners 2025",
+    tmdbId: 1233413,
+    urls: [
+      { locale: "be", url: "https://www.justwatch.com/be/film/sinners", scope: "be" },
+      { locale: "fr", url: "https://www.justwatch.com/fr/film/sinners", scope: "fr" }
+    ],
+    expectedYear: 2025,
+    expectedTitle: "sinners"
+  },
+  {
+    name: "The Raid / Muru 2022",
+    tmdbId: 995885,
+    urls: [
+      { locale: "be", url: "https://www.justwatch.com/be/film/muru", scope: "be" },
+      { locale: "fr", url: "https://www.justwatch.com/fr/film/muru", scope: "fr" }
+    ],
+    expectedYear: 2022,
+    expectedTitle: "the raid"
+  },
+  {
     name: "L'Odyssée 2026",
     tmdbId: 1368337,
     urls: [
