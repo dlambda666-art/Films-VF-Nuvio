@@ -44,6 +44,47 @@ const TESTS = [
     expectedYear: 2026,
     expectedTitle: "resident evil"
   }
+,
+  {
+    name: "Projet Dernière Chance 2026",
+    tmdbId: 687163,
+    urls: [
+      { locale: "be", url: "https://www.justwatch.com/be/film/projet-derniere-chance", scope: "be" },
+      { locale: "fr", url: "https://www.justwatch.com/fr/film/projet-derniere-chance", scope: "fr" }
+    ],
+    expectedYear: 2026,
+    expectedTitle: "projet dernière chance"
+  },
+  {
+    name: "Mortal Kombat II 2026",
+    tmdbId: 931285,
+    urls: [
+      { locale: "be", url: "https://www.justwatch.com/be/film/mortal-kombat-2", scope: "be" },
+      { locale: "fr", url: "https://www.justwatch.com/fr/film/mortal-kombat-2", scope: "fr" }
+    ],
+    expectedYear: 2026,
+    expectedTitle: "mortal kombat 2"
+  },
+  {
+    name: "Super Mario Galaxy 2026",
+    tmdbId: 1226863,
+    urls: [
+      { locale: "be", url: "https://www.justwatch.com/be/film/super-mario-galaxy-le-film", scope: "be" },
+      { locale: "fr", url: "https://www.justwatch.com/fr/film/super-mario-galaxy-le-film", scope: "fr" }
+    ],
+    expectedYear: 2026,
+    expectedTitle: "super mario galaxy le film"
+  },
+  {
+    name: "28 Ans plus tard : Le Temple des morts 2026",
+    tmdbId: 1272837,
+    urls: [
+      { locale: "be", url: "https://www.justwatch.com/be/film/28-ans-plus-tard-le-temple-des-morts", scope: "be" },
+      { locale: "fr", url: "https://www.justwatch.com/fr/film/28-years-later-the-bone-temple", scope: "fr" }
+    ],
+    expectedYear: 2026,
+    expectedTitle: "28 ans plus tard le temple des morts"
+  }
 ];
 
 function htmlToText(html) {
