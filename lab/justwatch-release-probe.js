@@ -160,6 +160,10 @@ function extractAvailability(text) {
   const notAvailable =
     lower.includes("n'est pas disponible en streaming") ||
     lower.includes("n’est pas disponible en streaming") ||
+    lower.includes("n'est pas disponible pour le pays belgique") ||
+    lower.includes("n’est pas disponible pour le pays belgique") ||
+    lower.includes("nous n'avons trouvé aucune option de streaming dans belgique") ||
+    lower.includes("nous n’avons trouvé aucune option de streaming dans belgique") ||
     lower.includes("aucune offre pour") ||
     lower.includes("aucune option de streaming");
 
