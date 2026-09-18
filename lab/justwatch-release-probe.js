@@ -5,6 +5,16 @@ const VF_INDEX_URL = "https://raw.githubusercontent.com/dlambda666-art/Films-VF-
 
 const TESTS = [
   {
+    name: "Conjuring : L'Heure du jugement 2025",
+    tmdbId: 1038392,
+    urls: [
+      { locale: "be", url: "https://www.justwatch.com/be/film/the-conjuring-lheure-du-jugement", scope: "be" },
+      { locale: "fr", url: "https://www.justwatch.com/fr/film/conjuring-lheure-du-jugement", scope: "fr" }
+    ],
+    expectedYear: 2025,
+    expectedTitle: "conjuring l'heure du jugement"
+  },
+  {
     name: "L'Odyssée 2026",
     tmdbId: 1368337,
     urls: [
