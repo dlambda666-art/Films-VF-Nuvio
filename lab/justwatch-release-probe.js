@@ -385,7 +385,7 @@ const RADAR_MODE = process.env.RADAR_MODE || "sample";
 
 function extractJustWatchLinks(html, locale) {
   const links = new Set();
-  const pattern = new RegExp('href=["\\']((?:https?:\\/\\/www\\.justwatch\\.com)?\\/' + locale + '\\/film\\/[^"\\'?#]+)', 'gi');
+    const pattern = new RegExp(`href=["']((?:https?:\\/\\/www\\.justwatch\\.com)?\\/${locale}\\/film\\/[^"'?#]+)`, 'gi');
   for (const match of html.matchAll(pattern)) {
     let url = match[1];
     if (url.startsWith('/')) url = 'https://www.justwatch.com' + url;
