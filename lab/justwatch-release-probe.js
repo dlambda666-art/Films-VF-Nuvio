@@ -45,14 +45,14 @@ const TESTS = [
 
 function htmlToText(html) {
   return html
-    .replace(/<script[\\s\\S]*?<\\/script>/gi, " ")
-    .replace(/<style[\\s\\S]*?<\\/style>/gi, " ")
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
     .replace(/<[^>]+>/g, " ")
     .replace(/&nbsp;/g, " ")
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
     .replace(/&amp;/g, "&")
-    .replace(/\\s+/g, " ")
+    .replace(/\s+/g, " ")
     .trim();
 }
 
@@ -60,13 +60,13 @@ function normalize(s) {
   return String(s || "")
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\\u0300-\\u036f]/g, "")
+    .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, " ")
     .trim();
 }
 
 function extractHeading(text) {
-  const m = text.match(/^\\s*([^|]+?)\\s*\\((\\d{4})\\)/);
+  const m = text.match(/^\s*([^|]+?)\s*\((\d{4})\)/);
   return m ? { title: m[1].trim(), year: Number(m[2]) } : null;
 }
 
@@ -80,8 +80,8 @@ function extractAvailability(text) {
     lower.includes("aucune option de streaming");
 
   const explicitOffers =
-    /(?:\\b(?:location|achat)\\b[^\\n]{0,120}\\d[,.]\\d{2}\\s*€)/i.test(text) ||
-    /(?:\\b(?:abonnement|streaming)\\b[^\\n]{0,120}\\d[,.]\\d{2}\\s*€)/i.test(text);
+    /(?:\b(?:location|achat)\b[^\n]{0,120}\d[,.]\d{2}\s*€)/i.test(text) ||
+    /(?:\b(?:abonnement|streaming)\b[^\n]{0,120}\d[,.]\d{2}\s*€)/i.test(text);
 
   return { notAvailable, hasExplicitOffer: explicitOffers };
 }
@@ -102,11 +102,11 @@ function extractDigitalReleaseDate(text) {
 
     const window = text.slice(index, index + 500);
 
-    const iso = window.match(/\\b20\\d{2}-\\d{2}-\\d{2}\\b/);
+    const iso = window.match(/\b20\d{2}-\d{2}-\d{2}\b/);
     if (iso) return { date: iso[0], matchedAnchor: anchor };
 
     const fr = window.match(
-      /\\b\\d{1,2}\\s+(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\\s+20\\d{2}\\b/i
+      /\b\d{1,2}\s+(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\s+20\d{2}\b/i
     );
     if (fr) return { date: fr[0], matchedAnchor: anchor };
   }
