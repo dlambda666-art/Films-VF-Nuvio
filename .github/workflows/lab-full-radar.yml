@@ -2,6 +2,9 @@ name: FrenchPulse full radar lab
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - lab/justwatch-release-probe
 
 jobs:
   full-radar:
