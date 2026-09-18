@@ -1,3 +1,6 @@
+import { writeFile } from "node:fs/promises";
+
+const RADAR_OUTPUT = "lab/justwatch-radar.json";
 const VF_INDEX_URL = "https://raw.githubusercontent.com/dlambda666-art/Films-VF-Nuvio/main/vf-index.json";
 
 const TESTS = [
@@ -81,7 +84,9 @@ function extractAvailability(text) {
 
   const explicitOffers =
     /(?:\b(?:location|achat)\b[^\n]{0,120}\d[,.]\d{2}\s*€)/i.test(text) ||
-    /(?:\b(?:abonnement|streaming)\b[^\n]{0,120}\d[,.]\d{2}\s*€)/i.test(text);
+    /(?:\b(?:abonnement|streaming)\b[^\n]{0,120}\d[,.]\d{2}\s*€)/i.test(text) ||
+    /\bdisponible\s+sur\s+\d+\s+services?\s+de\s+streaming\b/i.test(text) ||
+    /\bdisponible\s+sur\s+\d+\s+service[s]?\s+de\s+streaming\b/i.test(text);
 
   return { notAvailable, hasExplicitOffer: explicitOffers };
 }
@@ -227,13 +232,14 @@ function deriveRadar(result, vfRecord, now = new Date()) {
   }
 
   return {
-    status: "unknown",
+    status: "unresolved",
     reason: "valid_page_but_availability_not_confirmed",
     digitalReleaseReached: null
   };
 }
 
 const vfIndex = await loadVFIndex();
+const radarItems = [];
 
 for (const test of TESTS) {
   const results = [];
@@ -251,16 +257,40 @@ for (const test of TESTS) {
     ? deriveRadar(selected, vfRecord)
     : { status: "unresolved", reason: "no_result" };
 
-  console.log(JSON.stringify({
+  const item = {
+    tmdb_id: test.tmdbId,
     name: test.name,
-    tmdbId: test.tmdbId,
-    vfConfirmed: vfRecord?.vf_confirmed === true,
-    vfSource: vfRecord?.source || null,
-    selectedScope: selected?.scope || null,
-    selectedValidPage: selected?.validPage || false,
-    selectedNotAvailable: selected?.notAvailable ?? null,
-    selectedDigitalReleaseDate: selected?.digitalReleaseDate || null,
-    radar,
-    results
-  }));
+    vf_confirmed: vfRecord?.vf_confirmed === true,
+    vf_source: vfRecord?.source || null,
+    justwatch_scope: selected?.scope || null,
+    justwatch_url: selected?.url || null,
+    justwatch_valid: selected?.validPage === true,
+    legal_offer_detected: selected?.hasExplicitOffer === true,
+    not_available: selected?.notAvailable ?? null,
+    digital_release_date: selected?.digitalReleaseDate || null,
+    status: radar.status,
+    reason: radar.reason,
+    checked_at: new Date().toISOString()
+  };
+
+  radarItems.push(item);
+  console.log(JSON.stringify({ ...item, results }));
 }
+
+const radarDocument = {
+  schema_version: 1,
+  generated_at: new Date().toISOString(),
+  source: {
+    vf_index: VF_INDEX_URL,
+    justwatch: "public JustWatch pages"
+  },
+  statuses: {
+    nouveaute_vf: "VF confirmée + offre légale JustWatch détectée",
+    a_surveiller: "VF confirmée + pas encore disponible / sortie digitale future",
+    unresolved: "VF non confirmée, page JustWatch non fiable ou disponibilité non confirmée"
+  },
+  items: radarItems
+};
+
+await writeFile(RADAR_OUTPUT, JSON.stringify(radarDocument, null, 2) + "\n", "utf8");
+console.log(JSON.stringify({ radarOutput: RADAR_OUTPUT, itemCount: radarItems.length }));
