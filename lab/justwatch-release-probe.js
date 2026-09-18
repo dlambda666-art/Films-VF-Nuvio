@@ -45,6 +45,16 @@ const TESTS = [
     expectedTitle: "the raid"
   },
   {
+    name: "The Accountant² 2025",
+    tmdbId: 870028,
+    urls: [
+      { locale: "be", url: "https://www.justwatch.com/be/film/the-accountant", scope: "be" },
+      { locale: "fr", url: "https://www.justwatch.com/fr/film/the-accountant-2", scope: "fr" }
+    ],
+    expectedYear: 2025,
+    expectedTitle: "the accountant 2"
+  },
+  {
     name: "L'Odyssée 2026",
     tmdbId: 1368337,
     urls: [
