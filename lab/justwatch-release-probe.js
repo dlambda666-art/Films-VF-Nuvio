@@ -381,10 +381,75 @@ function deriveRadar(result, vfRecord, now = new Date()) {
   };
 }
 
+const RADAR_MODE = process.env.RADAR_MODE || "sample";
+
+function extractJustWatchLinks(html, locale) {
+  const links = new Set();
+  const pattern = new RegExp('href=["\\\']((?:https?:\\/\\/www\\.justwatch\\.com)?\\/' + locale + '\\/film\\/[^"\\\'?#]+)', 'gi');
+  for (const match of html.matchAll(pattern)) {
+    let url = match[1];
+    if (url.startsWith('/')) url = 'https://www.justwatch.com' + url;
+    links.add(url);
+  }
+  return [...links].slice(0, 12);
+}
+
+function slugScore(url, expectedTitle) {
+  const slug = normalize(decodeURIComponent(url.split('/film/')[1] || '').replace(/-/g, ' '));
+  const wanted = normalize(expectedTitle);
+  if (!slug || !wanted) return 0;
+  if (slug === wanted) return 100;
+  if (slug.includes(wanted) || wanted.includes(slug)) return 80;
+  const wantedTokens = wanted.split(' ').filter(x => x.length > 2);
+  const hits = wantedTokens.filter(token => slug.includes(token)).length;
+  return wantedTokens.length ? Math.round((hits / wantedTokens.length) * 60) : 0;
+}
+
+async function discoverJustWatchCandidates(title, year, locale) {
+  const searchUrl = 'https://www.justwatch.com/' + locale + '/recherche?q=' + encodeURIComponent(title);
+  const response = await fetch(searchUrl, { headers: { 'user-agent': 'Centralyser-FrenchPulse-lab/4.0' } });
+  if (!response.ok) return [];
+  const html = await response.text();
+  return extractJustWatchLinks(html, locale)
+    .map(url => ({ locale, scope: locale, url, score: slugScore(url, title), expectedYear: year }))
+    .sort((a, b) => b.score - a.score);
+}
+
+async function buildFullTest(item) {
+  const title = item.title || '';
+  const year = Number(item.year || 0);
+  return {
+    name: title || 'TMDB ' + item.tmdb_id,
+    tmdbId: Number(item.tmdb_id),
+    expectedYear: year,
+    expectedTitle: title,
+    urls: [
+      ...(await discoverJustWatchCandidates(title, year, 'be')),
+      ...(await discoverJustWatchCandidates(title, year, 'fr'))
+    ].slice(0, 16)
+  };
+}
+
+async function buildRadarTarget(item) {
+  if (RADAR_MODE !== 'full') return item;
+  try {
+    return await buildFullTest(item);
+  } catch (error) {
+    console.log('JustWatch search failed: ' + (item.title || item.tmdb_id) + ' -> ' + error.message);
+    return { name: item.title || 'TMDB ' + item.tmdb_id, tmdbId: Number(item.tmdb_id), expectedYear: Number(item.year || 0), expectedTitle: item.title || '', urls: [] };
+  }
+}
 const vfIndex = await loadVFIndex();
 const radarItems = [];
 
-for (const test of TESTS) {
+const sourceItems = RADAR_MODE === "full"
+  ? [...vfIndex.values()].filter(item => item?.vf_confirmed === true)
+  : TESTS;
+
+console.log(`Radar mode: ${RADAR_MODE} | targets: ${sourceItems.length}`);
+
+for (const sourceItem of sourceItems) {
+  const test = await buildRadarTarget(sourceItem);
   const results = [];
 
   for (const candidate of test.urls) {
