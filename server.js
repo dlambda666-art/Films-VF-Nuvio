@@ -6,7 +6,8 @@ const app = express();
 const PORT = Number(process.env.PORT || 8080);
 
 const catalogs = [
-  ["nouveautes-vf", "Nouveautés VF"],
+  ["nouveautes-vf", "FrenchPulse — Nouveautés VF"],
+  ["a-surveiller", "FrenchPulse — À surveiller"],
   ["horreur", "Horreur VF"]
 ];
 
