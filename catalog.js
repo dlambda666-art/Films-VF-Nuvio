@@ -231,7 +231,20 @@ async function buildCatalogInternal(catalogId) {
     return [];
   }
 
-  const ids = [...verifiedIds];
+  /*
+   * LAB uniquement :
+   * limiter le nombre d'IDs TMDB scannés afin que le Space
+   * puisse répondre rapidement pendant la validation.
+   * La valeur est configurable via FRENCHPULSE_LAB_MAX_IDS.
+   * 0 = aucun plafond.
+   */
+  const labMaxIds = Number(process.env.FRENCHPULSE_LAB_MAX_IDS || 250);
+  let ids = [...verifiedIds];
+
+  if (labMaxIds > 0 && ids.length > labMaxIds) {
+    ids = ids.slice(0, labMaxIds);
+    console.log(`Lab catalog scan capped at ${labMaxIds}/${verifiedIds.size} VF IDs`);
+  }
 
   /*
    * 20 appels simultanés :
@@ -314,7 +327,7 @@ async function buildCatalogInternal(catalogId) {
 
   /*
    * Aucun nombre maximum artificiel.
-   * Tous les films admissibles sont conservés.
+   * Tous les films admissibles du scan lab sont conservés.
    */
   const radar = await getRadarMap();
   return results.map(({ movie, vfRecord }) => {
