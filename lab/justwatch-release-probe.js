@@ -20,6 +20,16 @@ const TESTS = [
     expectedTitle: "spider-man: brand new day"
   },
   {
+    name: "Le Sifflet 2026",
+    tmdbId: 1193501,
+    urls: [
+      { locale: "be", url: "https://www.justwatch.com/be/film/le-sifflet", scope: "be" },
+      { locale: "fr", url: "https://www.justwatch.com/fr/film/whistle-2026", scope: "fr" }
+    ],
+    expectedYear: 2026,
+    expectedTitle: "le sifflet"
+  },
+  {
     name: "Resident Evil 2026",
     tmdbId: 1423191,
     urls: [
