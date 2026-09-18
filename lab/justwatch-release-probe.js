@@ -148,6 +148,53 @@ async function fetchPage(candidate, test) {
   };
 }
 
+function deriveRadar(result, now = new Date()) {
+  if (!result.validPage) {
+    return {
+      status: "unresolved",
+      reason: "justwatch_page_not_valid"
+    };
+  }
+
+  if (result.notAvailable === true) {
+    if (result.digitalReleaseDate) {
+      const release = new Date(result.digitalReleaseDate + "T00:00:00Z");
+      if (!Number.isNaN(release.getTime()) && release > now) {
+        return {
+          status: "a_surveiller",
+          reason: "digital_release_future",
+          digitalReleaseReached: false
+        };
+      }
+      return {
+        status: "a_surveiller",
+        reason: "digital_release_reached_but_not_available",
+        digitalReleaseReached: true
+      };
+    }
+
+    return {
+      status: "a_surveiller",
+      reason: "not_available_no_date",
+      digitalReleaseReached: null
+    };
+  }
+
+  if (result.hasExplicitOffer === true) {
+    return {
+      status: "nouveaute_vf",
+      reason: "explicit_legal_offer_detected",
+      digitalReleaseReached: true
+    };
+  }
+
+  return {
+    status: "unknown",
+    reason: "valid_page_but_availability_not_confirmed",
+    digitalReleaseReached: null
+  };
+}
+
 for (const test of TESTS) {
   const results = [];
 
