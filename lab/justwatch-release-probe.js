@@ -405,14 +405,33 @@ function slugScore(url, expectedTitle) {
   return wantedTokens.length ? Math.round((hits / wantedTokens.length) * 60) : 0;
 }
 
+function buildSearchQueries(title, year) {
+  const clean = String(title || '').trim();
+  const queries = [
+    clean,
+    year ? clean + ' ' + year : clean,
+    clean.replace(/[:|/]/g, ' '),
+    clean.replace(/\\b(?:film|movie)\\b/gi, ' ').replace(/[:|/]/g, ' ')
+  ];
+  return [...new Set(queries.map(q => q.replace(/\\s+/g, ' ').trim()).filter(Boolean))];
+}
+
 async function discoverJustWatchCandidates(title, year, locale) {
-  const searchUrl = 'https://www.justwatch.com/' + locale + '/recherche?q=' + encodeURIComponent(title);
-  const response = await fetch(searchUrl, { headers: { 'user-agent': 'Centralyser-FrenchPulse-lab/4.0' } });
-  if (!response.ok) return [];
-  const html = await response.text();
-  return extractJustWatchLinks(html, locale)
-    .map(url => ({ locale, scope: locale, url, score: slugScore(url, title), expectedYear: year }))
-    .sort((a, b) => b.score - a.score);
+  const candidates = new Map();
+  for (const query of buildSearchQueries(title, year)) {
+    const searchUrl = 'https://www.justwatch.com/' + locale + '/recherche?q=' + encodeURIComponent(query);
+    const response = await fetch(searchUrl, { headers: { 'user-agent': 'Centralyser-FrenchPulse-lab/4.0' } });
+    if (!response.ok) continue;
+    const html = await response.text();
+    for (const url of extractJustWatchLinks(html, locale)) {
+      const score = slugScore(url, title);
+      const current = candidates.get(url);
+      if (!current || score > current.score) {
+        candidates.set(url, { locale, scope: locale, url, score, expectedYear: year });
+      }
+    }
+  }
+  return [...candidates.values()].sort((a, b) => b.score - a.score).slice(0, 24);
 }
 
 async function buildFullTest(item) {
@@ -448,42 +467,49 @@ const sourceItems = RADAR_MODE === "full"
 
 console.log(`Radar mode: ${RADAR_MODE} | targets: ${sourceItems.length}`);
 
-for (const sourceItem of sourceItems) {
+const CONCURRENCY = Number(process.env.RADAR_CONCURRENCY || 6);
+
+async function processRadarItem(sourceItem) {
   const test = await buildRadarTarget(sourceItem);
   const results = [];
-
   for (const candidate of test.urls) {
     const result = await fetchPage(candidate, test);
     results.push(result);
-
     if (result.validPage && result.scope === "be") break;
   }
-
   const selected = [...results].reverse().find(x => x.validPage) || results[results.length - 1];
   const vfRecord = vfIndex.get(test.tmdbId) || null;
   const radar = selected
     ? deriveRadar(selected, vfRecord)
     : { status: "unresolved", reason: "no_result" };
-
-  const item = {
-    tmdb_id: test.tmdbId,
-    name: test.name,
-    vf_confirmed: vfRecord?.vf_confirmed === true,
-    vf_source: vfRecord?.source || null,
-    justwatch_scope: selected?.scope || null,
-    justwatch_url: selected?.url || null,
-    justwatch_valid: selected?.validPage === true,
-    legal_offer_detected: selected?.hasExplicitOffer === true,
-    not_available: selected?.notAvailable ?? null,
-    digital_release_date: selected?.digitalReleaseDate || null,
-    status: radar.status,
-    reason: radar.reason,
-    checked_at: new Date().toISOString()
-  };
-
-  radarItems.push(item);
-  console.log(JSON.stringify({ ...item, results }));
+  return { test, results, selected, vfRecord, radar };
 }
+
+for (let i = 0; i < sourceItems.length; i += CONCURRENCY) {
+  const batch = sourceItems.slice(i, i + CONCURRENCY);
+  const processed = await Promise.all(batch.map(processRadarItem));
+  for (const {test, results, selected, vfRecord, radar} of processed) {
+    const item = {
+      tmdb_id: test.tmdbId,
+      name: test.name,
+      vf_confirmed: vfRecord?.vf_confirmed === true,
+      vf_source: vfRecord?.source || null,
+      justwatch_scope: selected?.scope || null,
+      justwatch_url: selected?.url || null,
+      justwatch_valid: selected?.validPage === true,
+      legal_offer_detected: selected?.hasExplicitOffer === true,
+      not_available: selected?.notAvailable ?? null,
+      digital_release_date: selected?.digitalReleaseDate || null,
+      status: radar.status,
+      reason: radar.reason,
+      checked_at: new Date().toISOString()
+    };
+    radarItems.push(item);
+    console.log(JSON.stringify({ ...item, results }));
+  }
+  console.log(`Progress: ${Math.min(i + batch.length, sourceItems.length)}/${sourceItems.length}`);
+}
+const radarDocument = {
 
 const radarDocument = {
   schema_version: 1,
