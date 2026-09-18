@@ -1,0 +1,36 @@
+name: FrenchPulse addon lab deploy
+
+on:
+  push:
+    branches:
+      - lab/justwatch-release-probe
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-lab-space:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ensure isolated Hugging Face lab Space exists
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          set -e
+          curl -fsS -X POST \
+            -H "Authorization: Bearer ${HF_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d '{"name":"Films-VF-Nuvio-Lab","organization":"Lambda666","type":"space","sdk":"docker"}' \
+            https://huggingface.co/api/repos/create || true
+
+      - name: Sync lab addon to isolated Space
+        uses: huggingface/hub-sync@v0.1.0
+        with:
+          github_repo_id: ${{ github.repository }}
+          huggingface_repo_id: Lambda666/Films-VF-Nuvio-Lab
+          hf_token: ${{ secrets.HF_TOKEN }}
+          space_sdk: docker
