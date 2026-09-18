@@ -27,6 +27,21 @@ jobs:
             -d '{"name":"Films-VF-Nuvio-Lab","organization":"Lambda666","type":"space","sdk":"docker"}' \
             https://huggingface.co/api/repos/create || true
 
+      - name: Configure isolated lab Space runtime
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+        run: |
+          set -e
+          python -m pip install --quiet -U huggingface_hub
+          test -n "${TMDB_API_KEY}"
+          hf spaces secrets add Lambda666/Films-VF-Nuvio-Lab \
+            --token "${HF_TOKEN}" \
+            --secrets "TMDB_API_KEY=${TMDB_API_KEY}"
+          hf spaces variables add Lambda666/Films-VF-Nuvio-Lab \
+            --token "${HF_TOKEN}" \
+            --env "VF_INDEX_URL=https://raw.githubusercontent.com/dlambda666-art/Films-VF-Nuvio/lab/justwatch-release-probe/vf-index.json"
+
       - name: Sync lab addon to isolated Space
         uses: huggingface/hub-sync@v0.1.0
         with:
