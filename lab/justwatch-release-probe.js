@@ -1,12 +1,12 @@
 const TESTS = [
   {
     name: "L'Odyssée 2026",
-    tmdbId: 1062722,
+    tmdbId: 1368337,
     url: "https://www.justwatch.com/be/film/lodyssee-2026"
   },
   {
     name: "Spider-Man: Brand New Day",
-    tmdbId: null,
+    tmdbId: 969681,
     url: "https://www.justwatch.com/be/film/untitled-spider-man-sequel"
   },
   {
@@ -18,14 +18,14 @@ const TESTS = [
 
 function htmlToText(html) {
   return html
-    .replace(/<script[\\s\\S]*?<\\/script>/gi, " ")
-    .replace(/<style[\\s\\S]*?<\\/style>/gi, " ")
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
     .replace(/<[^>]+>/g, " ")
     .replace(/&nbsp;/g, " ")
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
     .replace(/&amp;/g, "&")
-    .replace(/\\s+/g, " ")
+    .replace(/\s+/g, " ")
     .trim();
 }
 
@@ -41,9 +41,12 @@ function extractReleaseDate(text) {
     const index = text.toLowerCase().indexOf(anchor.toLowerCase());
     if (index >= 0) {
       const window = text.slice(index, index + 800);
-      const iso = window.match(/\\b20\\d{2}-\\d{2}-\\d{2}\\b/);
+      const iso = window.match(/\b20\d{2}-\d{2}-\d{2}\b/);
       if (iso) return iso[0];
-      const fr = window.match(/\\b\\d{1,2}\\s+(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\\s+20\\d{2}\\b/i);
+
+      const fr = window.match(
+        /\b\d{1,2}\s+(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\s+20\d{2}\b/i
+      );
       if (fr) return fr[0];
     }
   }
@@ -53,6 +56,7 @@ function extractReleaseDate(text) {
 
 function extractAvailability(text) {
   const lower = text.toLowerCase();
+
   return {
     notAvailable:
       lower.includes("n'est pas disponible en streaming") ||
@@ -77,7 +81,6 @@ async function probe(test) {
 
   const html = await response.text();
   const text = htmlToText(html);
-  const titleMatch = text.match(/#\\s*([^|]{2,100})/);
 
   return {
     name: test.name,
@@ -85,8 +88,7 @@ async function probe(test) {
     url: test.url,
     httpStatus: response.status,
     releaseDate: extractReleaseDate(text),
-    ...extractAvailability(text),
-    pageTitle: titleMatch ? titleMatch[1].trim() : null
+    ...extractAvailability(text)
   };
 }
 
