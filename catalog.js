@@ -155,7 +155,7 @@ function getPoster(movie) {
   return undefined;
 }
 
-async function toMeta(movie, vfRecord) {
+function toMeta(movie, vfRecord) {
   return {
     id: `tmdb:${movie.id}`,
     type: "movie",
