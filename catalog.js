@@ -170,7 +170,12 @@ function toMeta(movie, vfRecord) {
       vf: true,
       vf_country: vfRecord?.vf_country || "FR",
       vf_source: vfRecord?.source || "DoublageVF",
-      vf_verified: true
+      vf_verified: true,
+      frenchpulse_meta_version: 1,
+      quality: null,
+      status: null,
+      reason: null,
+      digital_release_date: null
     }
   };
 }
